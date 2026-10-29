@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard - Vehicle Recovery</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header>
+  <div class="container">
+    <div class="brand">Vehicle Recovery <span>· Admin</span></div>
+    <nav>
+      <span style="color:var(--muted);"><strong id="user-name">...</strong></span>
+      <a href="#" id="logout-btn">Logout</a>
+    </nav>
+  </div>
+</header>
+<main class="container">
+  <div class="card">
+    <h2>🌍 Countries</h2>
+    <table>
+      <thead><tr><th>Code</th><th>Name</th><th>Currency</th><th>Active</th><th>Services</th><th>Admins</th></tr></thead>
+      <tbody id="countries-tbody"><tr><td colspan="6">Loading...</td></tr></tbody>
+    </table>
+  </div>
+
+  <div class="card hidden" id="analytics-card">
+    <h2>📊 Super Analytics</h2>
+    <table>
+      <thead><tr><th>Country</th><th>Total</th><th>Completed</th><th>Disputed</th><th>Gross</th><th>Commission</th><th>Drivers / Vehicles</th></tr></thead>
+      <tbody id="analytics-tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="row">
+      <h2 style="flex:1;">📋 Bookings Report</h2>
+      <span id="reports-count" style="color:var(--muted);"></span>
+      <a href="/api/admin/reports/bookings.csv" class="btn secondary small" download>⬇ Export CSV</a>
+    </div>
+    <table>
+      <thead><tr><th>#</th><th>Service</th><th>Status</th><th>Fare</th><th>Driver</th><th>Created</th></tr></thead>
+      <tbody id="reports-tbody"><tr><td colspan="6">Loading...</td></tr></tbody>
+    </table>
+  </div>
+</main>
+<script src="/app.js"></script>
+</body>
+</html>

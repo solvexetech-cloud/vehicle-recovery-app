@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vehicle Recovery App</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header>
+  <div class="container">
+    <div class="brand">Vehicle Recovery <span>· GCC</span></div>
+  </div>
+</header>
+<main class="container">
+  <div class="grid cols-2">
+    <div>
+      <div class="card">
+        <h2>🚨 On-Demand Vehicle Recovery</h2>
+        <p style="color:var(--muted);margin-bottom:16px;">
+          Immediate booking only. Towing, breakdown, accident recovery — nearby drivers dispatched in seconds.
+        </p>
+        <div class="stat"><div class="label">Server Status</div><div class="value" id="health-status">checking...</div></div>
+      </div>
+      <div class="card">
+        <h3>How it works</h3>
+        <ol style="padding-left:20px;color:var(--muted);line-height:1.8;">
+          <li>Register with your email (verification token shown in dev)</li>
+          <li>Save your vehicle & emergency destination</li>
+          <li>Tap "Recovery" → fare estimate → confirm</li>
+          <li>Nearest eligible driver dispatched automatically</li>
+          <li>Track live, pay cash or online (test mode)</li>
+        </ol>
+      </div>
+    </div>
+
+    <div>
+      <!-- LOGIN -->
+      <div class="card" id="login-card">
+        <h2>Login</h2>
+        <div id="login-error" class="error hidden"></div>
+        <form id="login-form">
+          <div class="form-group">
+            <label>Email or phone</label>
+            <input type="text" id="login-identifier" required placeholder="you@example.com">
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="login-password" required>
+          </div>
+          <button type="submit" class="btn">Login</button>
+        </form>
+        <p style="margin-top:16px;color:var(--muted);font-size:0.9em;">
+          New here? <a href="#" id="show-register" style="color:var(--primary);">Create account</a>
+        </p>
+      </div>
+
+      <!-- REGISTER -->
+      <div class="card hidden" id="register-card">
+        <h2>Register</h2>
+        <div id="register-error" class="error hidden"></div>
+        <form id="register-form">
+          <div class="form-group">
+            <label>Account type</label>
+            <select id="reg-role">
+              <option value="customer">Customer (need recovery)</option>
+              <option value="driver">Driver (offer recovery)</option>
+              <option value="agency">Agency (fleet owner)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Full name</label>
+            <input type="text" id="reg-full-name" required minlength="2">
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="reg-email" required>
+          </div>
+          <div class="form-group">
+            <label>Password (8+ chars, letter + digit)</label>
+            <input type="password" id="reg-password" required minlength="8">
+          </div>
+          <div class="form-group">
+            <label>Country</label>
+            <select id="reg-country"></select>
+          </div>
+          <button type="submit" class="btn">Register</button>
+        </form>
+        <div id="verify-info" class="hidden" style="margin-top:16px;">
+          <div class="success-msg">Registration successful! Verify your email:</div>
+          <div id="verify-link"></div>
+          <p style="margin-top:12px;color:var(--muted);font-size:0.85em;">
+            (In production, this link is emailed. In dev, it is shown here for convenience.)
+          </p>
+        </div>
+        <p style="margin-top:16px;color:var(--muted);font-size:0.9em;">
+          Have an account? <a href="#" id="show-login" style="color:var(--primary);">Login</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</main>
+<script src="/app.js"></script>
+</body>
+</html>

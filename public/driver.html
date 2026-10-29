@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Driver Dashboard - Vehicle Recovery</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header>
+  <div class="container">
+    <div class="brand">Vehicle Recovery <span>· Driver</span></div>
+    <nav>
+      <span style="color:var(--muted);">Hello, <strong id="user-name">...</strong></span>
+      <a href="#" id="logout-btn">Logout</a>
+    </nav>
+  </div>
+</header>
+<main class="container">
+  <div id="offer-div"><div class="info">Checking for offers...</div></div>
+  <div id="active-div"></div>
+  <div class="card">
+    <h3>How to go online</h3>
+    <p style="color:var(--muted);">
+      Your driver account must be approved (admin), have an active driving license document,
+      a current vehicle set, GPS fresh within 5 min, and driver status online.
+      Use the API or admin panel to complete these steps.
+    </p>
+    <p style="color:var(--muted);margin-top:8px;">
+      GPS updates automatically every 30s using browser geolocation.
+    </p>
+  </div>
+</main>
+<script src="/app.js"></script>
+</body>
+</html>

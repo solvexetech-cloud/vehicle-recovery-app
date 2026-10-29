@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const config = require('./config');
 const { openDatabase } = require('./db');
 const { runMigrations } = require('./migrate');
@@ -29,6 +29,7 @@ function createApp(opts = {}) {
   const log = opts.logger || logger;
   const app = express();
   app.use(express.json({ limit: '4mb' }));
+  app.use(express.static(require('node:path').join(__dirname, '..', 'public')));
 
   app.use((req, res, next) => {
     const start = Date.now();

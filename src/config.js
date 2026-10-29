@@ -29,5 +29,5 @@ module.exports = {
     defaultPageSize: 50,
     maxPageSize: 200
   },
-  appVersion: '0.11.0'
+  appVersion: '1.0.0'
 };

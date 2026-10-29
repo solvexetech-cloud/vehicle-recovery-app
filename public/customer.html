@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customer Dashboard - Vehicle Recovery</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header>
+  <div class="container">
+    <div class="brand">Vehicle Recovery <span>· Customer</span></div>
+    <nav>
+      <span style="color:var(--muted);">Hello, <strong id="user-name">...</strong></span>
+      <a href="#" id="logout-btn">Logout</a>
+    </nav>
+  </div>
+</header>
+<main class="container">
+  <div class="info" id="country-info">Loading...</div>
+
+  <div class="grid cols-2">
+    <div class="card">
+      <h2>🚨 New Recovery</h2>
+      <form id="new-booking-form">
+        <div class="form-group">
+          <label>Pickup location</label>
+          <input type="text" id="bk-pickup" placeholder="e.g. Doha, Industrial Area" required>
+        </div>
+        <div class="form-group">
+          <label>Destination</label>
+          <input type="text" id="bk-destination" placeholder="e.g. Garage, Salwa Road" required>
+        </div>
+        <div class="form-group">
+          <label>Your vehicle registration</label>
+          <input type="text" id="bk-plate" placeholder="e.g. QA-12345" required>
+        </div>
+        <button type="submit" class="btn success">Get Estimate & Book</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>Your Vehicles</h2>
+      <table>
+        <thead><tr><th>Category</th><th>Plate</th><th>Make/Model</th><th></th><th></th></tr></thead>
+        <tbody id="vehicles-tbody"><tr><td colspan="5">Loading...</td></tr></tbody>
+      </table>
+      <details style="margin-top:16px;">
+        <summary style="cursor:pointer;color:var(--primary);">+ Add Vehicle</summary>
+        <form id="add-vehicle-form" style="margin-top:12px;">
+          <div class="form-group"><label>Category</label>
+            <select id="v-category"><option value="suv">SUV</option><option value="sedan_hatchback">Sedan/Hatchback</option><option value="pickup">Pickup</option><option value="van">Van</option><option value="truck">Truck</option><option value="motorcycle">Motorcycle</option></select>
+          </div>
+          <div class="form-group"><label>Plate</label><input type="text" id="v-plate" required></div>
+          <div class="form-group"><label>Make</label><input type="text" id="v-make"></div>
+          <div class="form-group"><label>Model</label><input type="text" id="v-model"></div>
+          <button class="btn small" type="submit">Add</button>
+        </form>
+      </details>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Your Bookings</h2>
+    <table>
+      <thead><tr><th>#</th><th>Service</th><th>Status</th><th>Fare</th><th>Created</th><th></th></tr></thead>
+      <tbody id="bookings-tbody"><tr><td colspan="6">Loading...</td></tr></tbody>
+    </table>
+  </div>
+
+  <div class="card" id="tracking-details">
+    <p style="color:var(--muted);">Click "Track" on a booking to view details.</p>
+  </div>
+</main>
+<script src="/app.js"></script>
+</body>
+</html>
