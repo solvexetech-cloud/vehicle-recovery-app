@@ -1,0 +1,16 @@
+﻿node_modules/
+data/
+.env
+*.log
+*.db
+*.db-wal
+*.db-shm
+test-output-*.txt
+verify-*.js
+patch-*.js
+diag-*.js
+*.bak
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
