@@ -22,7 +22,7 @@ function routes(db) {
     return db.prepare('SELECT * FROM bookings WHERE id = ? AND driver_id = ?').get(bookingId, driverId);
   }
 
-  // Incoming offer
+  // ---- Incoming offer ----
   r.get('/incoming', (req, res, next) => {
     try {
       const driver = getDriver(req.user.id);
@@ -52,7 +52,7 @@ function routes(db) {
     } catch (e) { next(e); }
   });
 
-  // Accept
+  // ---- Accept ----
   r.post('/:id/accept', (req, res, next) => {
     try {
       const driver = getDriver(req.user.id);
@@ -63,14 +63,31 @@ function routes(db) {
       let result;
       withTransaction(db, () => {
         result = tryAccept(db, { bookingId, driverId: driver.id });
-        audit(db, {
-          actor_user_id: req.user.id, actor_role: req.user.role,
-          action: result.ok ? 'dispatch.accepted' : 'dispatch.accept_failed',
-          entity_type: 'booking', entity_id: bookingId,
-          country_id: driver.country_id,
-          metadata: { driver_id: driver.id, reason: result.reason || 'ok' },
-          ip: req.ip, user_agent: req.headers['user-agent']
-        });
+        if (result.ok) {
+          try {
+            notifyBookingCustomer(db, bookingId, {
+              kind: 'booking.assigned',
+              title: 'Driver assigned to your booking',
+              body: result.booking.booking_number,
+              data: { booking_id: bookingId }
+            });
+          } catch (_) { /* non-fatal */ }
+          audit(db, {
+            actor_user_id: req.user.id, actor_role: req.user.role,
+            action: 'dispatch.accepted', entity_type: 'booking', entity_id: bookingId,
+            country_id: result.booking.country_id,
+            metadata: { driver_id: driver.id, booking_number: result.booking.booking_number },
+            ip: req.ip, user_agent: req.headers['user-agent']
+          });
+        } else {
+          audit(db, {
+            actor_user_id: req.user.id, actor_role: req.user.role,
+            action: 'dispatch.accept_failed', entity_type: 'booking', entity_id: bookingId,
+            country_id: driver.country_id,
+            metadata: { driver_id: driver.id, reason: result.reason, blockers: result.blockers || null },
+            ip: req.ip, user_agent: req.headers['user-agent']
+          });
+        }
       });
 
       if (!result.ok) {
@@ -98,7 +115,7 @@ function routes(db) {
     } catch (e) { next(e); }
   });
 
-  // Reject
+  // ---- Reject ----
   r.post('/:id/reject', (req, res, next) => {
     try {
       const driver = getDriver(req.user.id);
@@ -135,7 +152,7 @@ function routes(db) {
     } catch (e) { next(e); }
   });
 
-  // Active booking
+  // ---- Active booking ----
   r.get('/active', (req, res, next) => {
     try {
       const driver = getDriver(req.user.id);
@@ -161,8 +178,8 @@ function routes(db) {
     } catch (e) { next(e); }
   });
 
-  // ---- trip transitions ----
-  function transitionHandler(to, { optionalValidation } = {}) {
+  // ---- Trip transitions ----
+  function transitionHandler(to) {
     return (req, res, next) => {
       try {
         const driver = getDriver(req.user.id);
@@ -175,7 +192,6 @@ function routes(db) {
         const from = booking.status;
         const body = req.body || {};
         const metadata = {};
-        const extraColumns = {};
 
         if (to === 'driver_arrived') {
           const d = db.prepare('SELECT last_gps_lat, last_gps_lng, last_gps_at FROM drivers WHERE id = ?').get(driver.id);
@@ -213,17 +229,18 @@ function routes(db) {
           result = tryTransition(db, {
             bookingId, from, to,
             actorUserId: req.user.id, actorRole: 'driver',
-            reason: body.reason || null, metadata,
-            extraColumns
+            reason: body.reason || null, metadata
           });
           if (result.ok) {
             if (to === 'trip_completed') {
-              notifyBookingCustomer(db, bookingId, {
-                kind: 'booking.trip_completed',
-                title: 'Your trip is complete',
-                body: result.booking.booking_number,
-                data: { booking_id: bookingId }
-              });
+              try {
+                notifyBookingCustomer(db, bookingId, {
+                  kind: 'booking.trip_completed',
+                  title: 'Your trip is complete',
+                  body: result.booking.booking_number,
+                  data: { booking_id: bookingId }
+                });
+              } catch (_) { /* non-fatal */ }
             }
             audit(db, {
               actor_user_id: req.user.id, actor_role: req.user.role,
@@ -235,7 +252,7 @@ function routes(db) {
         });
 
         if (!result.ok) {
-          return res.status(409).json({ error: result.reason, current_status: from, expected_status: Object.keys({}).length ? undefined : undefined });
+          return res.status(409).json({ error: result.reason });
         }
         res.json({ ok: true, booking: {
           id: result.booking.id, booking_number: result.booking.booking_number, status: result.booking.status,
@@ -252,7 +269,7 @@ function routes(db) {
   r.post('/:id/start-trip', transitionHandler('trip_in_progress'));
   r.post('/:id/complete', transitionHandler('trip_completed'));
 
-  // ---- cancel ----
+  // ---- Cancel ----
   r.post('/:id/cancel', (req, res, next) => {
     try {
       const driver = getDriver(req.user.id);

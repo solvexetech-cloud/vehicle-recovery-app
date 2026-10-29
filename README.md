@@ -1,4 +1,4 @@
-# Vehicle Recovery App
+﻿# Vehicle Recovery App
 
 On-demand vehicle recovery platform. Immediate booking only.
 Multi-country ready, local-first, zero-cost development.
@@ -161,3 +161,26 @@ Multi-country ready, local-first, zero-cost development.
 - Paid services are not activated.
 - Local development only.
 - See TECHNICAL_DECISIONS.md, SCHEMA.md.
+## Backup and Restore
+
+Backup the SQLite database:
+
+    .\scripts\backup.ps1
+
+Restore from a backup:
+
+    .\scripts\restore.ps1 -BackupFile data\backups\app-YYYYMMDD-HHMMSS.db
+
+Retention: last 7 backups kept automatically.
+
+## Deployment
+
+See `DEPLOYMENT.md` for free-tier hosting options and production checklist.
+
+## Phase status
+
+See `MASTER_PLAN_STATUS.md` for the current phase and known gaps.
+
+## Environment variables
+
+See `.env.example` for all config options.

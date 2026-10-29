@@ -1,4 +1,4 @@
-const path = require('node:path');
+﻿const path = require('node:path');
 require('dotenv').config();
 
 module.exports = {
@@ -29,5 +29,5 @@ module.exports = {
     defaultPageSize: 50,
     maxPageSize: 200
   },
-  appVersion: '0.10.0'
+  appVersion: '0.11.0'
 };

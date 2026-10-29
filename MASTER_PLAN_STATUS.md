@@ -32,8 +32,8 @@ Live tracking of implementation vs FINAL MASTER PLAN V2.10.
 | 8 | Payments: cash + test-online + dispute | DONE | 247 | - | 2026-10-29 |
 | 9 | Support + chat + notifications + dispute | DONE | 262 | 009 | 2026-10-29 |
 | 10 | Admin dashboards + reports | DONE | 275 | 010 | 2026-10-29 |
-| 11 | Security + backup + QA sweep | NEXT | - | - | - |
-| 12 | Final handoff + docs | PENDING | - | - | - |
+| 11 | Security + backup + TD-099 + QA | DONE | ~300 | - | 2026-10-29 |
+| 12 | Final handoff + docs | NEXT | - | - | - |
 
 ## Deferred Items (per Master Plan sections 1.1, 3, 15)
 
@@ -55,7 +55,7 @@ Live tracking of implementation vs FINAL MASTER PLAN V2.10.
 
 | ID | Gap | Impact | Fix planned |
 |---|---|---|---|
-| TD-099 | Accept/complete notification hooks may not fire notifyBookingCustomer | Customers may miss booking.assigned / booking.trip_completed in-app notifications | Phase 10 |
+| TD-099 | ~~Accept/complete notification hooks~~ | **FIXED in Phase 11** (verified by tests/notifications11.test.js) | Done |
 
 ## Security Invariants (verified on every commit)
 
@@ -97,4 +97,5 @@ For every new phase:
 
 The Master Plan document itself is not modified - it remains the authoritative specification.
 This status file reflects actual implementation vs spec.
+
 
