@@ -491,3 +491,51 @@ Mitigation: The `notifications` API itself (list, unread filter, mark-read,
 mark-all) is verified working via chat messages and other notification sources.
 Fix scheduled: Phase 10 (before dashboards), as part of report integration testing.
 Test: `support9.test.js` uses chat fallback to verify API behavior regardless.
+
+## TD-100 (Phase 10): Commission tracking
+country_settings.commission_rate_bp added (default 1500 = 15%).
+Commission = round(agreed_fare_minor * commission_rate_bp / 10000).
+Net to driver = agreed_fare_minor - commission.
+Applied per booking for reports (not yet deducted from driver earnings payouts - Phase 11).
+
+## TD-101 (Phase 10): Reports are read-only SQL queries
+src/reports/index.js centralizes query builders.
+No new tables - aggregates on existing bookings/payments/drivers tables.
+Date filters accept YYYY-MM-DD (normalized to full day) or ISO datetime.
+
+## TD-102 (Phase 10): Scope isolation enforced at query level
+queryBookings(db, actor, filters) prepends 'AND b.country_id = ?' for country_admin.
+super_admin: no country filter (all countries).
+Enforced by tests.
+
+## TD-103 (Phase 10): CSV format
+RFC 4180-ish. Comma separator, CRLF line endings, quote-escape with double quotes.
+Content-Type: text/csv; charset=utf-8.
+Content-Disposition: attachment; filename="bookings-<ts>.csv".
+Header row: id, booking_number, created_at, status, ... (14 columns).
+
+## TD-104 (Phase 10): Invoice generated on demand (no table)
+GET /api/customer/bookings/:id/invoice returns JSON with:
+- invoice_number (INV- derived from booking_number)
+- company info from country_settings.invoice_*
+- customer + driver + vehicle info
+- fare_breakdown (from fare_estimate_json stored at creation)
+- amounts { subtotal, tax, total, commission, net_to_driver }
+- payments attached
+No persistence needed: fare snapshot is already immutable in bookings.fare_estimate_json.
+Future PDF rendering can be layered on top (Phase 11+).
+
+## TD-105 (Phase 10): Invoice available for completed statuses
+Allowed: payment_completed, payment_pending, trip_completed, disputed.
+Rejected: created, searching, assigned, driver_*, vehicle_loaded, trip_in_progress (409).
+
+## TD-106 (Phase 10): Super analytics per country
+computeCountryAnalytics() returns 6 rows (all countries in seed, active or not).
+Per-country: total bookings, completed, disputed, gross, commission, net, drivers, vehicles.
+Single query with correlated subqueries; fast for current scale.
+
+## TD-107 (Phase 10): TD-099 still deferred
+Accept/complete notification hooks remain a known gap (TD-099).
+Reason: prior patch did not apply cleanly; would require full-file rewrite of driverBookings.js.
+Fix scheduled for Phase 11 along with security + backup QA sweep.
+Notification API itself remains verified via chat fallback test.

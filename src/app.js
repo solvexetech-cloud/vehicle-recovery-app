@@ -18,6 +18,7 @@ const agencyRoutes = require('./routes/agency');
 const bookingsRoutes = require('./routes/bookings');
 const dispatchRoutes = require('./routes/dispatch');
 const driverBookingsRoutes = require('./routes/driverBookings');
+const reportsRoutes = require('./routes/reports');
 const customerPaymentsRoutes = require('./routes/customerPayments');
 const driverPaymentsRoutes = require('./routes/driverPayments');
 const customerSupportRoutes = require('./routes/customerSupport');
@@ -53,7 +54,7 @@ function createApp(opts = {}) {
 
   app.use(attachUser(db));
 
-  app.get('/', (req, res) => res.type('text/plain').send('Vehicle Recovery App - Phase 9.0 OK'));
+  app.get('/', (req, res) => res.type('text/plain').send('Vehicle Recovery App - Phase 10.0 OK'));
 
   app.get('/health', (req, res) => {
     let dbStatus = 'error';
@@ -92,6 +93,7 @@ function createApp(opts = {}) {
 
   app.use('/api/auth', authRoutes.routes(db, config));
   app.use('/api/countries', countriesRoutes.routes(db));
+  app.use('/api/admin/reports', reportsRoutes.routes(db));
   app.use('/api/admin', adminSupportRoutes.routes(db));
   app.use('/api/admin', adminRoutes.routes(db));
   app.use('/api/super', superRoutes.routes(db, config));

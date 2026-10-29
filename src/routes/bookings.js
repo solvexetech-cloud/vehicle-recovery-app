@@ -389,6 +389,128 @@ function routes(db) {
     } catch (e) { next(e); }
   });
 
+  // ---- INVOICE (customer, for own booking) ----
+  r.get('/:id/invoice', (req, res, next) => {
+    try {
+      const id = Number(req.params.id);
+      if (!Number.isInteger(id) || id <= 0) return next(Errors.validation('invalid_id'));
+      const b = db.prepare('SELECT * FROM bookings WHERE id = ? AND customer_id = ?').get(id, req.user.id);
+      if (!b) return next(Errors.notFound('booking_not_found'));
+      if (!['payment_completed', 'payment_pending', 'trip_completed', 'disputed'].includes(b.status)) {
+        return next(Errors.conflict('invoice_not_available_for_status_' + b.status));
+      }
+      const country = db.prepare('SELECT * FROM countries WHERE id = ?').get(b.country_id);
+      const cs = db.prepare('SELECT * FROM country_settings WHERE country_id = ?').get(b.country_id) || {};
+      const customer = db.prepare('SELECT id, full_name, email, phone FROM users WHERE id = ?').get(b.customer_id);
+      const driver = b.driver_id
+        ? db.prepare('SELECT d.id, u.full_name, u.email FROM drivers d JOIN users u ON u.id = d.user_id WHERE d.id = ?').get(b.driver_id)
+        : null;
+      const vehicle = b.recovery_vehicle_id
+        ? db.prepare('SELECT id, plate_number, vehicle_type, make, model FROM recovery_vehicles WHERE id = ?').get(b.recovery_vehicle_id)
+        : null;
+      const fare = JSON.parse(b.fare_estimate_json || '{}');
+      const commission_bp = cs.commission_rate_bp || 1500;
+      const commission_minor = Math.round((b.agreed_fare_minor * commission_bp) / 10000);
+      const payments = db.prepare('SELECT method, status, amount_minor, currency_code FROM payments WHERE booking_id = ?').all(b.id);
+
+      res.json({
+        invoice: {
+          invoice_number: 'INV-' + b.booking_number.replace('BK-', ''),
+          issued_at: new Date().toISOString(),
+          booking_number: b.booking_number,
+          booking_status: b.status,
+          currency_code: b.currency_code,
+          company: {
+            name: cs.invoice_company_name || 'Vehicle Recovery App',
+            address: cs.invoice_company_address || null,
+            tax_id: cs.invoice_tax_id || null
+          },
+          customer: {
+            full_name: customer.full_name,
+            email: customer.email,
+            phone: customer.phone || null
+          },
+          driver: driver ? { full_name: driver.full_name, email: driver.email } : null,
+          recovery_vehicle: vehicle,
+          service: {
+            type: b.service_type,
+            level: b.service_level,
+            pickup: { lat: b.pickup_lat, lng: b.pickup_lng, address: b.pickup_address },
+            destination: { lat: b.destination_lat, lng: b.destination_lng, address: b.destination_address }
+          },
+          fare_breakdown: fare,
+          amounts: {
+            subtotal_minor: fare.subtotal_minor || (b.agreed_fare_minor - (fare.tax_minor || 0)),
+            tax_minor: fare.tax_minor || 0,
+            total_minor: b.agreed_fare_minor,
+            commission_minor,
+            commission_rate_bp: commission_bp,
+            net_to_driver_minor: b.agreed_fare_minor - commission_minor
+          },
+          payments,
+          generated_by: 'vehicle-recovery-app',
+          is_paid: b.status === 'payment_completed',
+          country_code: country ? country.code : null
+        }
+      });
+    } catch (e) { next(e); }
+  });
+
+  r.get('/:id/invoice', (req, res, next) => {
+    try {
+      const id = Number(req.params.id);
+      if (!Number.isInteger(id) || id <= 0) return next(Errors.validation('invalid_id'));
+      const b = db.prepare('SELECT * FROM bookings WHERE id = ? AND customer_id = ?').get(id, req.user.id);
+      if (!b) return next(Errors.notFound('booking_not_found'));
+      if (!['payment_completed', 'payment_pending', 'trip_completed', 'disputed'].includes(b.status)) {
+        return next(Errors.conflict('invoice_not_available_for_status_' + b.status));
+      }
+      const country = db.prepare('SELECT * FROM countries WHERE id = ?').get(b.country_id);
+      const cs = db.prepare('SELECT * FROM country_settings WHERE country_id = ?').get(b.country_id) || {};
+      const customer = db.prepare('SELECT id, full_name, email, phone FROM users WHERE id = ?').get(b.customer_id);
+      const driver = b.driver_id
+        ? db.prepare('SELECT d.id, u.full_name, u.email FROM drivers d JOIN users u ON u.id = d.user_id WHERE d.id = ?').get(b.driver_id)
+        : null;
+      const vehicle = b.recovery_vehicle_id
+        ? db.prepare('SELECT id, plate_number, vehicle_type, make, model FROM recovery_vehicles WHERE id = ?').get(b.recovery_vehicle_id)
+        : null;
+      const fare = JSON.parse(b.fare_estimate_json || '{}');
+      const commission_bp = cs.commission_rate_bp || 1500;
+      const commission_minor = Math.round((b.agreed_fare_minor * commission_bp) / 10000);
+      const payments = db.prepare('SELECT method, status, amount_minor, currency_code FROM payments WHERE booking_id = ?').all(b.id);
+      res.json({
+        invoice: {
+          invoice_number: 'INV-' + b.booking_number.replace('BK-', ''),
+          issued_at: new Date().toISOString(),
+          booking_number: b.booking_number, booking_status: b.status, currency_code: b.currency_code,
+          company: {
+            name: cs.invoice_company_name || 'Vehicle Recovery App',
+            address: cs.invoice_company_address || null,
+            tax_id: cs.invoice_tax_id || null
+          },
+          customer: { full_name: customer.full_name, email: customer.email, phone: customer.phone || null },
+          driver: driver ? { full_name: driver.full_name, email: driver.email } : null,
+          recovery_vehicle: vehicle,
+          service: {
+            type: b.service_type, level: b.service_level,
+            pickup: { lat: b.pickup_lat, lng: b.pickup_lng, address: b.pickup_address },
+            destination: { lat: b.destination_lat, lng: b.destination_lng, address: b.destination_address }
+          },
+          fare_breakdown: fare,
+          amounts: {
+            subtotal_minor: fare.subtotal_minor || (b.agreed_fare_minor - (fare.tax_minor || 0)),
+            tax_minor: fare.tax_minor || 0, total_minor: b.agreed_fare_minor,
+            commission_minor, commission_rate_bp: commission_bp,
+            net_to_driver_minor: b.agreed_fare_minor - commission_minor
+          },
+          payments, generated_by: 'vehicle-recovery-app',
+          is_paid: b.status === 'payment_completed',
+          country_code: country ? country.code : null
+        }
+      });
+    } catch (e) { next(e); }
+  });
+
   return r;
 }
 

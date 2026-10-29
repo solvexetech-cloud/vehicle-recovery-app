@@ -25,5 +25,9 @@ module.exports = {
     chatMessageMaxLen: 1000,
     notificationBodyMaxLen: 500
   },
-  appVersion: '0.9.0'
+  reports: {
+    defaultPageSize: 50,
+    maxPageSize: 200
+  },
+  appVersion: '0.10.0'
 };

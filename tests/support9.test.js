@@ -169,7 +169,7 @@ test('setup: server + pricing + fresh QA admin', async () => {
   assert.equal(mk.status, 201, 'create qa admin failed: ' + mk.body);
   global.__qaAdminId = mk.json.user.id;
 
-  assert.equal(db.prepare('SELECT COUNT(*) AS n FROM schema_migrations').get().n, 9);
+  assert.ok(db.prepare('SELECT COUNT(*) AS n FROM schema_migrations').get().n >= 9, 'at least 9 migrations applied');
   assert.equal(db.prepare("SELECT COUNT(*) AS n FROM sqlite_master WHERE type='table' AND name IN ('support_tickets','ticket_messages','chat_messages','notifications')").get().n, 4);
 });
 

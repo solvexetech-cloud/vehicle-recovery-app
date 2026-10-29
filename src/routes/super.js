@@ -4,6 +4,7 @@ const { requireRole } = require('../middleware/auth');
 const { audit } = require('../audit');
 const { hashPassword, isWeakPassword } = require('../auth');
 const { ensureCountryConfig, SERVICE_CODES } = require('../countries/config');
+const R = require('../reports/index');
 
 const CODE_RE = /^[A-Z]{2}$/;
 const CCY_RE = /^[A-Z]{3}$/;
@@ -194,6 +195,20 @@ function routes(db, config) { // eslint-disable-line no-unused-vars
         'FROM users u LEFT JOIN countries c ON c.id = u.country_id WHERE u.id = ?'
       ).get(id);
       res.json({ user: updated });
+    } catch (e) { next(e); }
+  });
+
+  r.get('/analytics', guard, (req, res, next) => {
+    try {
+      const countries = R.computeCountryAnalytics(db);
+      res.json({ countries, generated_at: new Date().toISOString() });
+    } catch (e) { next(e); }
+  });
+
+  r.get('/analytics', guard, (req, res, next) => {
+    try {
+      const countries = R.computeCountryAnalytics(db);
+      res.json({ countries, generated_at: new Date().toISOString() });
     } catch (e) { next(e); }
   });
 
