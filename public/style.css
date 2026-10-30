@@ -969,3 +969,1152 @@ main.screen.active {
     to { opacity: 1; transform: translateY(0); }
 }
 
+
+/* ─── LUCIDE ICON FIXES ─── */
+.nav-item i[data-lucide],
+.nav-icon svg {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    stroke-width: 2.5;
+    transition: transform 0.2s ease;
+    vertical-align: middle;
+    margin-bottom: 4px;
+}
+.nav-item.active i[data-lucide],
+.nav-item.active svg {
+    stroke-width: 3;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+.nav-item:hover i[data-lucide] {
+    transform: scale(1.1);
+}
+
+/* ─── BRAND LOGO (Gold Square) ─── */
+header .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 800;
+    font-size: 1.1em;
+}
+header .brand::before {
+    content: "";
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg, #F5C518, #E0AE00);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(245,197,24,0.35);
+    flex-shrink: 0;
+}
+
+/* ─── REMOVE OLD EMOJI FROM BRAND ─── */
+header .brand span:first-child {
+    display: none;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   VRA REFINED PALETTE — Softer Black + Gold
+   Better readability, distinct input fields, comfortable dark mode
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ─── DARK THEME (Refined) ─── */
+:root,
+[data-theme="dark"] {
+    --bg: #0F1215;
+    --card: #1A1D21;
+    --card-elevated: #23262B;
+    --border: #2A2D32;
+    --border-subtle: rgba(255,255,255,0.08);
+    --primary: #F5C518;
+    --primary-text: #0F1215;
+    --primary-glow: rgba(245,197,24,0.25);
+    --fg: #F5F5F5;
+    --muted: #9CA3AF;
+    --input-bg: #25282C;
+    --input-border: #35383D;
+    --success: #22C55E;
+    --danger: #EF4444;
+    --warning: #F59E0B;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.4);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.3);
+    --shadow-lg: 0 12px 32px rgba(0,0,0,0.5);
+}
+
+/* ─── LIGHT THEME (Refined) ─── */
+[data-theme="light"] {
+    --bg: #F7F7F9;
+    --card: #FFFFFF;
+    --card-elevated: #FFFFFF;
+    --border: #E0E0E5;
+    --border-subtle: rgba(0,0,0,0.08);
+    --primary: #B8860B;
+    --primary-text: #FFFFFF;
+    --primary-glow: rgba(184,134,11,0.25);
+    --fg: #1A1A1A;
+    --muted: #6B7280;
+    --input-bg: #F0F0F3;
+    --input-border: #D5D5DB;
+    --success: #059669;
+    --danger: #DC2626;
+    --warning: #D97706;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+    --shadow-lg: 0 12px 32px rgba(0,0,0,0.15);
+}
+
+/* ─── BODY (Background) ─── */
+body {
+    background: var(--bg) !important;
+    color: var(--fg) !important;
+}
+
+/* ─── INPUT FIELDS (DISTINCT — most important fix) ─── */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"],
+input[type="number"],
+select,
+textarea,
+.form-group input,
+.form-group select {
+    background: var(--input-bg) !important;
+    border: 1.5px solid var(--input-border) !important;
+    color: var(--fg) !important;
+    border-radius: 12px !important;
+    padding: 14px 16px !important;
+    font-size: 0.95em !important;
+    transition: all 0.2s ease !important;
+}
+
+/* Input placeholder — visible but subtle */
+input::placeholder,
+textarea::placeholder {
+    color: var(--muted) !important;
+    opacity: 0.7 !important;
+}
+
+/* Input focus — gold ring */
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="tel"]:focus,
+select:focus,
+textarea:focus {
+    outline: none !important;
+    border-color: var(--primary) !important;
+    background: var(--card-elevated) !important;
+    box-shadow: 0 0 0 3px var(--primary-glow) !important;
+}
+
+/* ─── NAV ACTIVE — GOLD (override any lime green) ─── */
+.nav-item.active,
+button.nav-item.active,
+.bottom-nav .nav-item.active {
+    background: var(--primary) !important;
+    background-color: var(--primary) !important;
+    background-image: none !important;
+    color: var(--primary-text) !important;
+    box-shadow: 0 4px 16px var(--primary-glow) !important;
+    border: none !important;
+}
+.nav-item.active .nav-icon,
+.nav-item.active svg {
+    stroke: var(--primary-text) !important;
+    color: var(--primary-text) !important;
+    filter: none !important;
+}
+
+/* ─── KILL ANY REMAINING LIME GREEN ─── */
+.btn:not(.secondary):not(.danger) {
+    background: linear-gradient(135deg, #F5C518 0%, #E0AE00 100%) !important;
+    background-color: #F5C518 !important;
+    color: #0F1215 !important;
+}
+.btn:not(.secondary):not(.danger):hover {
+    background: linear-gradient(135deg, #FFD740 0%, #F5C518 100%) !important;
+}
+
+/* ─── CARDS (Elevated but not too dark) ─── */
+.card {
+    background: var(--card) !important;
+    border: 1px solid var(--border-subtle) !important;
+    border-radius: 20px !important;
+    padding: 20px !important;
+    box-shadow: var(--shadow-md) !important;
+}
+[data-theme="dark"] .card {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2) !important;
+}
+
+/* ─── LIST ITEMS ─── */
+.list-item {
+    background: var(--card-elevated) !important;
+    border: 1px solid var(--border-subtle) !important;
+    color: var(--fg) !important;
+}
+
+/* ─── TEXT READABILITY (Dark theme) ─── */
+[data-theme="dark"] .card h2,
+[data-theme="dark"] .list-item-title,
+[data-theme="dark"] body {
+    color: var(--fg) !important;
+}
+[data-theme="dark"] .muted,
+[data-theme="dark"] [style*="color: var(--muted)"],
+[data-theme="dark"] [style*="color:#6b7280"] {
+    color: var(--muted) !important;
+}
+
+/* ─── HEADER (Softer glass) ─── */
+header {
+    background: rgba(15,18,21,0.85) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border-bottom: 1px solid var(--border-subtle) !important;
+}
+[data-theme="light"] header {
+    background: rgba(247,247,249,0.9) !important;
+}
+
+
+/* ─── BRAND LOGO STYLES (Final) ─── */
+header .brand {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
+header .brand::before {
+    display: none !important;  /* Remove old gold square pseudo */
+}
+header .brand .brand-logo {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 8px !important;
+    flex-shrink: 0;
+    filter: drop-shadow(0 2px 6px rgba(245,197,24,0.4));
+}
+header .brand .brand-text {
+    font-weight: 800 !important;
+    letter-spacing: -0.4px !important;
+    font-size: 1.05em !important;
+    color: var(--fg) !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   VRA LIME PREMIUM FINAL — Restore lime, add polish
+   Vibrant lime + soft dark + glass + premium buttons
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ─── DARK THEME (Soft black, lime accent) ─── */
+:root,
+[data-theme="dark"] {
+    --bg: #0F0F0F;
+    --bg-gradient: linear-gradient(180deg, #0F0F0F 0%, #141414 100%);
+    --card: #1A1A1A;
+    --card-elevated: #222222;
+    --border: #2A2A2A;
+    --border-subtle: rgba(255,255,255,0.07);
+    --primary: #B8FF00;
+    --primary-hover: #CCFF00;
+    --primary-text: #0A0A0A;
+    --primary-glow: rgba(184,255,0,0.35);
+    --primary-soft: rgba(184,255,0,0.12);
+    --fg: #FFFFFF;
+    --muted: #9CA3AF;
+    --input-bg: #252525;
+    --input-border: #353535;
+    --success: #22C55E;
+    --danger: #EF4444;
+    --warning: #F59E0B;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.5);
+    --shadow-lg: 0 16px 48px rgba(0,0,0,0.6);
+    --shadow-lime: 0 8px 32px rgba(184,255,0,0.35);
+}
+
+/* ─── LIGHT THEME ─── */
+[data-theme="light"] {
+    --bg: #F8FAF5;
+    --bg-gradient: linear-gradient(180deg, #F8FAF5 0%, #F0F5E8 100%);
+    --card: #FFFFFF;
+    --card-elevated: #FFFFFF;
+    --border: #E5E7EB;
+    --border-subtle: rgba(0,0,0,0.06);
+    --primary: #65A30D;
+    --primary-hover: #84CC16;
+    --primary-text: #FFFFFF;
+    --primary-glow: rgba(101,163,13,0.3);
+    --primary-soft: rgba(101,163,13,0.08);
+    --fg: #0A0A0A;
+    --muted: #6B7280;
+    --input-bg: #F3F4F6;
+    --input-border: #E5E7EB;
+    --success: #059669;
+    --danger: #DC2626;
+    --warning: #D97706;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+    --shadow-lg: 0 16px 48px rgba(0,0,0,0.12);
+    --shadow-lime: 0 8px 32px rgba(101,163,13,0.25);
+}
+
+/* ─── BODY (Soft gradient) ─── */
+body {
+    background: var(--bg-gradient) !important;
+    color: var(--fg) !important;
+    min-height: 100vh;
+}
+
+/* ─── CARDS (Premium elevation) ─── */
+.card {
+    background: var(--card) !important;
+    border: 1px solid var(--border-subtle) !important;
+    border-radius: 22px !important;
+    padding: 22px !important;
+    box-shadow: var(--shadow-md) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg) !important;
+    border-color: var(--primary-soft) !important;
+}
+
+/* ─── INPUT FIELDS (Distinct + premium) ─── */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"],
+input[type="number"],
+select,
+textarea,
+.form-group input,
+.form-group select {
+    background: var(--input-bg) !important;
+    border: 1.5px solid var(--input-border) !important;
+    color: var(--fg) !important;
+    border-radius: 14px !important;
+    padding: 15px 18px !important;
+    font-size: 0.95em !important;
+    font-family: var(--font) !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+input::placeholder,
+textarea::placeholder {
+    color: var(--muted) !important;
+    opacity: 0.65 !important;
+    font-weight: 500 !important;
+}
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="tel"]:focus,
+select:focus,
+textarea:focus {
+    outline: none !important;
+    border-color: var(--primary) !important;
+    background: var(--card-elevated) !important;
+    box-shadow: 0 0 0 4px var(--primary-soft) !important;
+}
+
+/* ─── PRIMARY BUTTON (Lime gradient with premium shadow) ─── */
+.btn,
+.btn:not(.secondary):not(.danger) {
+    background: linear-gradient(135deg, #CCFF00 0%, #A8E600 100%) !important;
+    color: #0A0A0A !important;
+    border: none !important;
+    border-radius: 16px !important;
+    padding: 16px 24px !important;
+    font-weight: 800 !important;
+    font-size: 0.95em !important;
+    letter-spacing: 0.3px !important;
+    box-shadow: 0 8px 24px rgba(184,255,0,0.4), inset 0 1px 0 rgba(255,255,255,0.3) !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative;
+    overflow: hidden;
+}
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.5s;
+}
+.btn:hover::before {
+    left: 100%;
+}
+.btn:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 12px 32px rgba(184,255,0,0.55), inset 0 1px 0 rgba(255,255,255,0.4) !important;
+}
+.btn:active {
+    transform: translateY(0) !important;
+}
+
+[data-theme="light"] .btn,
+[data-theme="light"] .btn:not(.secondary):not(.danger) {
+    background: linear-gradient(135deg, #84CC16 0%, #65A30D 100%) !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 8px 24px rgba(101,163,13,0.3) !important;
+}
+
+/* ─── SECONDARY BUTTON ─── */
+.btn.secondary,
+.btn.small.secondary {
+    background: transparent !important;
+    border: 1.5px solid var(--border) !important;
+    color: var(--fg) !important;
+    box-shadow: none !important;
+}
+.btn.secondary:hover {
+    border-color: var(--primary) !important;
+    color: var(--primary) !important;
+    background: var(--primary-soft) !important;
+}
+
+/* ─── DANGER BUTTON ─── */
+.btn.danger {
+    background: transparent !important;
+    border: 1.5px solid var(--danger) !important;
+    color: var(--danger) !important;
+    box-shadow: none !important;
+}
+.btn.danger:hover {
+    background: rgba(239,68,68,0.12) !important;
+}
+
+/* ─── SMALL BUTTONS (+ Add Vehicle etc.) ─── */
+.btn.small {
+    padding: 8px 18px !important;
+    font-size: 0.8em !important;
+    border-radius: 12px !important;
+    width: auto !important;
+    box-shadow: 0 4px 12px rgba(184,255,0,0.25) !important;
+    letter-spacing: 0.2px !important;
+}
+
+/* ─── HEADER (Glass with lime brand accent) ─── */
+header {
+    background: rgba(15,15,15,0.85) !important;
+    backdrop-filter: blur(24px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+    border-bottom: 1px solid var(--border-subtle) !important;
+    padding: 14px 0 !important;
+}
+[data-theme="light"] header {
+    background: rgba(248,250,245,0.9) !important;
+}
+
+/* ─── BOTTOM NAV (Premium glass + lime active pill) ─── */
+.bottom-nav {
+    background: rgba(26,26,26,0.9) !important;
+    backdrop-filter: blur(24px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+    border: 1px solid var(--border-subtle) !important;
+    border-radius: 32px !important;
+    padding: 8px !important;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.03) inset !important;
+}
+[data-theme="light"] .bottom-nav {
+    background: rgba(255,255,255,0.92) !important;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.03) inset !important;
+}
+
+.nav-item {
+    color: var(--muted) !important;
+    border-radius: 24px !important;
+    padding: 10px 20px !important;
+    font-size: 0.72em !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.3px !important;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    border: none !important;
+    background: transparent !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 3px !important;
+}
+.nav-item:hover {
+    color: var(--fg) !important;
+    background: rgba(255,255,255,0.04) !important;
+}
+.nav-item.active {
+    background: var(--primary) !important;
+    color: var(--primary-text) !important;
+    box-shadow: 0 6px 24px var(--primary-glow), 0 0 0 1px rgba(0,0,0,0.05) inset !important;
+    transform: scale(1.02);
+}
+.nav-item.active svg,
+.nav-item.active .nav-icon,
+.nav-item.active i[data-lucide] {
+    stroke: var(--primary-text) !important;
+    color: var(--primary-text) !important;
+    filter: none !important;
+}
+.nav-item svg {
+    width: 22px !important;
+    height: 22px !important;
+    stroke-width: 2.5 !important;
+    transition: transform 0.25s ease !important;
+}
+.nav-item.active svg {
+    stroke-width: 3 !important;
+    transform: scale(1.05);
+}
+
+/* ─── SERVICE CARDS (arrow indicator) ─── */
+#tab-services .list-item {
+    position: relative;
+    padding: 18px 50px 18px 18px !important;
+    border-radius: 16px !important;
+    transition: all 0.25s ease !important;
+    cursor: pointer;
+}
+#tab-services .list-item::after {
+    content: "→";
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.4em;
+    color: var(--muted);
+    transition: all 0.25s ease;
+}
+#tab-services .list-item:hover::after {
+    color: var(--primary);
+    transform: translateY(-50%) translateX(6px);
+}
+
+/* ─── EMPTY STATES (big icons, CTA) ─── */
+.empty-state {
+    text-align: center;
+    padding: 36px 20px;
+}
+.empty-state-icon {
+    font-size: 3.5em;
+    margin-bottom: 14px;
+    opacity: 0.5;
+    display: block;
+    filter: grayscale(0.3);
+}
+.empty-state-text {
+    font-size: 1em;
+    font-weight: 700;
+    color: var(--fg);
+    letter-spacing: -0.2px;
+}
+.empty-state-sub {
+    font-size: 0.82em;
+    color: var(--muted);
+    margin-top: 6px;
+}
+
+/* ─── ACCOUNT AVATAR (Lime gradient) ─── */
+.account-avatar {
+    width: 68px !important;
+    height: 68px !important;
+    border-radius: 50% !important;
+    background: linear-gradient(135deg, #CCFF00, #A8E600) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.9em !important;
+    font-weight: 900 !important;
+    color: #0A0A0A !important;
+    box-shadow: 0 8px 24px rgba(184,255,0,0.45) !important;
+    border: 3px solid var(--card) !important;
+}
+[data-theme="light"] .account-avatar {
+    background: linear-gradient(135deg, #84CC16, #65A30D) !important;
+    color: white !important;
+    box-shadow: 0 8px 24px rgba(101,163,13,0.35) !important;
+}
+
+/* ─── BADGES ─── */
+.badge {
+    padding: 5px 12px !important;
+    border-radius: 8px !important;
+    font-size: 0.68em !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.4px !important;
+    text-transform: uppercase !important;
+}
+.badge.payment_completed,
+.badge.trip_completed {
+    background: rgba(34,197,94,0.15) !important;
+    color: #22C55E !important;
+}
+.badge.assigned,
+.badge.driver_accepted,
+.badge.driver_arrived,
+.badge.trip_in_progress {
+    background: var(--primary-soft) !important;
+    color: var(--primary) !important;
+}
+.badge.created,
+.badge.searching {
+    background: rgba(245,158,11,0.15) !important;
+    color: #F59E0B !important;
+}
+.badge.cancelled,
+.badge.no_driver_available,
+.badge.payment_failed {
+    background: rgba(239,68,68,0.15) !important;
+    color: #EF4444 !important;
+}
+
+/* ─── MAP (Premium frame) ─── */
+#map-container,
+.map-container {
+    border-radius: 20px !important;
+    border: 2px solid var(--border-subtle) !important;
+    box-shadow: var(--shadow-md) !important;
+    overflow: hidden !important;
+}
+
+/* ─── MODALS (Lime accent) ─── */
+.modal-content {
+    background: var(--card) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 28px !important;
+    padding: 28px !important;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.9) !important;
+}
+.modal-content h3 {
+    font-size: 1.25em !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.3px !important;
+    margin-bottom: 20px !important;
+}
+
+/* ─── HEADER BUTTONS ─── */
+#theme-toggle,
+#lang-toggle {
+    background: var(--card) !important;
+    border: 1px solid var(--border-subtle) !important;
+    color: var(--fg) !important;
+    border-radius: 14px !important;
+    padding: 9px 15px !important;
+    font-weight: 700 !important;
+    font-size: 0.82em !important;
+    transition: all 0.2s ease !important;
+}
+#theme-toggle:hover,
+#lang-toggle:hover {
+    background: var(--primary) !important;
+    color: var(--primary-text) !important;
+    border-color: var(--primary) !important;
+    box-shadow: 0 4px 12px var(--primary-glow) !important;
+}
+#logout-btn {
+    color: var(--danger) !important;
+    background: rgba(239,68,68,0.1) !important;
+    border: 1px solid rgba(239,68,68,0.25) !important;
+    padding: 9px 16px !important;
+    border-radius: 14px !important;
+    font-weight: 700 !important;
+    font-size: 0.82em !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease !important;
+}
+#logout-btn:hover {
+    background: var(--danger) !important;
+    color: white !important;
+}
+
+/* ─── SMOOTH ANIMATIONS ─── */
+main.screen.active {
+    animation: slideUpFade 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+@keyframes slideUpFade {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── TOAST ─── */
+#vra-toast {
+    background: var(--card-elevated) !important;
+    color: var(--fg) !important;
+    border: 1px solid var(--primary) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.5), 0 0 20px var(--primary-glow) !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.2px !important;
+}
+
+/* ─── BRAND (Lime logo) ─── */
+header .brand {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
+header .brand::before {
+    display: none !important;
+}
+header .brand .brand-logo {
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 10px !important;
+    filter: drop-shadow(0 4px 12px rgba(184,255,0,0.45));
+}
+header .brand .brand-text {
+    font-weight: 800 !important;
+    font-size: 1.05em !important;
+    letter-spacing: -0.4px !important;
+}
+
+/* ─── FORM LABELS ─── */
+.form-group label {
+    color: var(--muted) !important;
+    font-size: 0.72em !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.8px !important;
+    text-transform: uppercase !important;
+    margin-bottom: 8px !important;
+    display: block !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   COMPACT EMPTY STATES — Nice cards, not giant spaces
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Horizontal compact empty state */
+.empty-compact {
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+    padding: 18px 16px !important;
+    background: var(--card-elevated) !important;
+    border: 1px dashed var(--border) !important;
+    border-radius: 16px !important;
+    transition: all 0.25s ease !important;
+}
+.empty-compact:hover {
+    border-color: var(--primary) !important;
+    background: var(--primary-soft) !important;
+}
+
+.empty-compact-icon {
+    font-size: 2em !important;
+    width: 52px !important;
+    height: 52px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: var(--primary-soft) !important;
+    border-radius: 14px !important;
+    flex-shrink: 0;
+    opacity: 0.85;
+}
+
+.empty-compact-body {
+    flex: 1 !important;
+    min-width: 0;
+}
+
+.empty-compact-title {
+    font-size: 0.95em !important;
+    font-weight: 700 !important;
+    color: var(--fg) !important;
+    margin-bottom: 2px;
+    letter-spacing: -0.2px;
+}
+
+.empty-compact-sub {
+    font-size: 0.78em !important;
+    color: var(--muted) !important;
+    line-height: 1.3;
+}
+
+.empty-compact-cta {
+    padding: 8px 14px !important;
+    background: var(--primary) !important;
+    color: var(--primary-text) !important;
+    border: none !important;
+    border-radius: 10px !important;
+    font-size: 0.78em !important;
+    font-weight: 800 !important;
+    cursor: pointer !important;
+    white-space: nowrap !important;
+    box-shadow: 0 4px 12px var(--primary-glow) !important;
+    transition: all 0.2s ease !important;
+    letter-spacing: 0.2px;
+}
+.empty-compact-cta:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px var(--primary-glow) !important;
+}
+
+/* List items — slightly smaller overall */
+#tab-home .card {
+    padding: 18px !important;
+    margin-bottom: 14px !important;
+}
+
+/* Card headers — tighter */
+#tab-home .card > div:first-child {
+    margin-bottom: 12px !important;
+}
+
+#tab-home .card h2 {
+    font-size: 1em !important;
+}
+
+/* Vehicles/Destinations lists — compact gap */
+#vehicles-list,
+#destinations-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+}
+
+/* Remove massive padding when empty */
+#vehicles-list:empty::after,
+#destinations-list:empty::after {
+    content: none !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   SMART BUTTON SIZING — Add buttons compact when list empty
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Add Vehicle / Add Place buttons — smaller by default */
+#tab-home .card .btn.small,
+#tab-home .card button.btn.small,
+#tab-home .card button[onclick*="openModal"] {
+    padding: 7px 14px !important;
+    font-size: 0.75em !important;
+    font-weight: 800 !important;
+    border-radius: 20px !important;
+    box-shadow: 0 2px 8px var(--primary-glow) !important;
+    letter-spacing: 0.3px !important;
+    min-width: auto !important;
+    height: auto !important;
+    line-height: 1.2 !important;
+}
+
+/* Card headers — tighter vertical space */
+#tab-home .card > div:first-child {
+    margin-bottom: 14px !important;
+    gap: 10px !important;
+    align-items: center !important;
+}
+
+/* Empty state row — compact */
+.empty-compact {
+    padding: 14px 16px !important;
+    border-radius: 14px !important;
+    gap: 12px !important;
+}
+.empty-compact-icon {
+    width: 44px !important;
+    height: 44px !important;
+    font-size: 1.7em !important;
+    border-radius: 12px !important;
+}
+.empty-compact-title {
+    font-size: 0.9em !important;
+    margin-bottom: 2px !important;
+}
+.empty-compact-sub {
+    font-size: 0.72em !important;
+}
+
+/* Card titles — smaller for more compact */
+#tab-home .card h2 {
+    font-size: 0.95em !important;
+    letter-spacing: -0.2px !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   PREMIUM FORM ELEMENTS — Custom styled selects, inputs
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ─── KILL NATIVE SELECT STYLING ─── */
+select {
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23B8FF00' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 16px center !important;
+    background-size: 18px !important;
+    padding-right: 48px !important;
+    cursor: pointer !important;
+}
+
+[data-theme="light"] select {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2365A30D' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+}
+
+/* ─── SELECT OPTION STYLING (limited by browser) ─── */
+select option {
+    background: #1A1A1A !important;
+    color: #FFFFFF !important;
+    padding: 12px !important;
+    font-weight: 500 !important;
+}
+[data-theme="light"] select option {
+    background: #FFFFFF !important;
+    color: #0A0A0A !important;
+}
+
+/* ─── INPUT/SELECT SHARED PREMIUM STYLE ─── */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"],
+input[type="number"],
+select,
+textarea,
+.form-group input,
+.form-group select {
+    background: var(--input-bg) !important;
+    border: 1.5px solid var(--input-border) !important;
+    color: var(--fg) !important;
+    border-radius: 14px !important;
+    padding: 15px 18px !important;
+    font-size: 0.95em !important;
+    font-weight: 500 !important;
+    font-family: var(--font) !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* Placeholder styling */
+input::placeholder,
+textarea::placeholder {
+    color: var(--muted) !important;
+    opacity: 0.65 !important;
+    font-weight: 500 !important;
+}
+
+/* Focus state — premium glow */
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="tel"]:focus,
+input[type="number"]:focus,
+select:focus,
+textarea:focus,
+.form-group input:focus,
+.form-group select:focus {
+    outline: none !important;
+    border-color: var(--primary) !important;
+    background: var(--card-elevated) !important;
+    box-shadow: 0 0 0 4px var(--primary-soft), 0 2px 8px rgba(0,0,0,0.15) !important;
+    transform: translateY(-1px);
+}
+
+/* Hover state */
+input:hover,
+select:hover,
+textarea:hover {
+    border-color: var(--input-border) !important;
+    background: var(--card-elevated) !important;
+}
+
+/* ─── FORM LABELS — more premium ─── */
+.form-group label {
+    color: var(--muted) !important;
+    font-size: 0.7em !important;
+    font-weight: 800 !important;
+    letter-spacing: 1px !important;
+    text-transform: uppercase !important;
+    margin-bottom: 8px !important;
+    display: block !important;
+}
+
+/* ─── CARD HEADER PREMIUM ─── */
+.card h2 {
+    font-size: 1.05em !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.3px !important;
+    color: var(--fg) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin-bottom: 18px !important;
+}
+
+/* ─── CARD PADDING REFINEMENT ─── */
+.card {
+    padding: 22px 20px !important;
+    border-radius: 22px !important;
+}
+
+/* ─── SPACING BETWEEN FORM FIELDS ─── */
+.form-group {
+    margin-bottom: 14px !important;
+}
+
+/* ─── HEADER BUTTONS — better icons ─── */
+#theme-toggle,
+#lang-toggle {
+    background: var(--card-elevated) !important;
+    border: 1.5px solid var(--border) !important;
+    color: var(--fg) !important;
+    border-radius: 12px !important;
+    padding: 8px 14px !important;
+    font-weight: 800 !important;
+    font-size: 0.78em !important;
+    transition: all 0.2s ease !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+}
+#theme-toggle:hover,
+#lang-toggle:hover {
+    background: var(--primary) !important;
+    color: var(--primary-text) !important;
+    border-color: var(--primary) !important;
+    transform: translateY(-1px);
+}
+
+#logout-btn {
+    color: #EF4444 !important;
+    background: rgba(239,68,68,0.1) !important;
+    border: 1.5px solid rgba(239,68,68,0.25) !important;
+    padding: 8px 14px !important;
+    border-radius: 12px !important;
+    font-weight: 800 !important;
+    font-size: 0.78em !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease !important;
+    display: inline-flex !important;
+    align-items: center !important;
+}
+#logout-btn:hover {
+    background: #EF4444 !important;
+    color: #FFFFFF !important;
+    border-color: #EF4444 !important;
+    transform: translateY(-1px);
+}
+
+/* ─── FORM ROW (for side-by-side) ─── */
+.form-row {
+    display: flex !important;
+    gap: 12px !important;
+    margin-bottom: 14px !important;
+}
+.form-row .form-group {
+    flex: 1 !important;
+    margin-bottom: 0 !important;
+}
+
+/* ─── BUTTONS — final polish ─── */
+.btn {
+    padding: 16px 24px !important;
+    font-size: 0.95em !important;
+    font-weight: 800 !important;
+    border-radius: 14px !important;
+    letter-spacing: 0.3px !important;
+    box-shadow: 0 6px 20px var(--primary-glow) !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    min-height: 52px !important;
+}
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px var(--primary-glow) !important;
+}
+.btn:active {
+    transform: translateY(0) !important;
+}
+
+/* ─── SMALL BUTTONS ─── */
+.btn.small {
+    padding: 8px 16px !important;
+    font-size: 0.78em !important;
+    border-radius: 12px !important;
+    min-height: auto !important;
+    letter-spacing: 0.2px !important;
+}
+
+
+/* Header button icon alignment */
+#theme-toggle i[data-lucide],
+#lang-toggle i[data-lucide],
+#logout-btn i[data-lucide] {
+    display: inline-block !important;
+    width: 14px !important;
+    height: 14px !important;
+    stroke-width: 2.5 !important;
+    vertical-align: middle !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   LIGHT MODE BORDER FIX — Better contrast, visible cards
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Light mode — stronger borders and backgrounds */
+[data-theme="light"] {
+    --bg: #F0F2F5;                  /* Darker bg for contrast */
+    --card: #FFFFFF;                /* Pure white cards */
+    --card-elevated: #FAFBFC;       /* Slight off-white for nested */
+    --border: #D1D5DB;              /* Darker, visible border */
+    --border-subtle: rgba(0,0,0,0.12);  /* Stronger subtle border */
+    --input-border: #D1D5DB;        /* More visible input border */
+}
+
+/* Cards — prominent border + shadow in light mode */
+[data-theme="light"] .card {
+    border: 1.5px solid #E2E4E9 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04) !important;
+}
+
+/* List items — clear border in light mode */
+[data-theme="light"] .list-item {
+    background: #FAFBFC !important;
+    border: 1.5px solid #E5E7EB !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03) !important;
+}
+
+/* Booking history items — extra visible */
+[data-theme="light"] #booking-history .list-item {
+    border: 1.5px solid #D1D5DB !important;
+    background: #FFFFFF !important;
+}
+
+/* Bottom nav — visible in light mode */
+[data-theme="light"] .bottom-nav {
+    background: rgba(255,255,255,0.98) !important;
+    border: 1.5px solid #E2E4E9 !important;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1) !important;
+}
+
+/* Input fields — visible border */
+[data-theme="light"] input[type="text"],
+[data-theme="light"] input[type="email"],
+[data-theme="light"] input[type="password"],
+[data-theme="light"] select,
+[data-theme="light"] textarea {
+    border: 1.5px solid #D1D5DB !important;
+    background: #FFFFFF !important;
+}
+
+/* Empty state — visible */
+[data-theme="light"] .empty-compact {
+    background: #FAFBFC !important;
+    border: 1.5px dashed #D1D5DB !important;
+}
+
+/* Header — clear separation */
+[data-theme="light"] header {
+    background: rgba(255,255,255,0.98) !important;
+    border-bottom: 1.5px solid #E2E4E9 !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+}
+

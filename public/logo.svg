@@ -1,0 +1,15 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <rect width="64" height="64" rx="14" fill="url(#limeGrad)"/>
+  <defs>
+    <linearGradient id="limeGrad" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#CCFF00"/>
+      <stop offset="100%" stop-color="#A8E600"/>
+    </linearGradient>
+  </defs>
+  <path d="M32 14 L50 22 L50 36 Q50 48 32 54 Q14 48 14 36 L14 22 Z" 
+        stroke="#0A0A0A" stroke-width="3.5" stroke-linejoin="round" fill="none"/>
+  <path d="M20 36 L25 29 L39 29 L44 36 L46 36 L46 41 L41 41 L41 43 L37 43 L37 41 L27 41 L27 43 L23 43 L23 41 L18 41 L18 36 Z" 
+        fill="#0A0A0A"/>
+  <circle cx="26" cy="38" r="2" fill="#CCFF00"/>
+  <circle cx="38" cy="38" r="2" fill="#CCFF00"/>
+</svg>

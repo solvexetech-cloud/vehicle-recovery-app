@@ -26,7 +26,7 @@
             const data = await res.json();
             const list = document.getElementById('vehicles-list');
             if(!list) return;
-            if (data.length === 0) { list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🚗</div><div class="empty-state-text">No vehicles yet</div><div style="font-size:0.8em;margin-top:4px;">Tap + Add Vehicle to begin</div></div>'; return; }
+            if (data.length === 0) { list.innerHTML = '"<div class="empty-compact"><div class="empty-compact-icon">🚗</div><div class="empty-compact-body"><div class="empty-compact-title">No vehicles yet</div><div class="empty-compact-sub">Add your first vehicle</div></div></div>"'; return; }
             list.innerHTML = data.map(v => `
                 <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; background:#f9fafb; border-radius:10px; margin-bottom:10px;">
                     <div><strong style="display:block;">${v.make} ${v.model}</strong><span style="font-size:13px; color:#6b7280;">${v.category} • ${v.registration || 'No Plate'}</span></div>
@@ -59,7 +59,7 @@
             const data = await res.json();
             const list = document.getElementById('destinations-list');
             if(!list) return;
-            if (data.length === 0) { list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📍</div><div class="empty-state-text">No saved places</div><div style="font-size:0.8em;margin-top:4px;">Tap + Add Place to save</div></div>'; return; }
+            if (data.length === 0) { list.innerHTML = '"<div class="empty-compact"><div class="empty-compact-icon">📍</div><div class="empty-compact-body"><div class="empty-compact-title">No saved places</div><div class="empty-compact-sub">Save frequent destinations</div></div></div>"'; return; }
             list.innerHTML = data.map(d => `
                 <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; background:#f9fafb; border-radius:10px; margin-bottom:10px;">
                     <div><strong style="display:block;">${d.name}</strong><span style="font-size:13px; color:#6b7280;">${d.address}</span></div>
@@ -137,12 +137,7 @@
 
     // ─── Auth helpers ───
     function getToken() {
-        try { 
-            const t = localStorage.getItem('vra_token') || localStorage.getItem('token') || '';
-            if (t) return t;
-            if (localStorage.getItem('vra_session_active')) return 'cookie-session';
-            return '';
-        }
+        try { return localStorage.getItem('vra_token') || localStorage.getItem('token') || (localStorage.getItem('vra_session_active') ? 'cookie-session' : ''); }
         catch(e) { return ''; }
     }
     function setToken(t) {
@@ -164,7 +159,7 @@
     async function apiFetch(path, opts) {
         opts = opts || {};
         const headers = Object.assign({}, opts.headers || {});
-        const token = getToken();
+        const token = getToken() || localStorage.getItem('vra_session_active') || '';
         if (token) headers['Authorization'] = 'Bearer ' + token;
         if (opts.body && typeof opts.body === 'object' && !(opts.body instanceof FormData)) {
             headers['Content-Type'] = 'application/json';
@@ -241,16 +236,9 @@
             const user = getUser();
             const accInfo = document.getElementById('account-info');
             if (accInfo && user) {
-                const name = user.full_name || user.name || user.email || 'User';
-                const email = user.email || '';
-                const initial = String(name).charAt(0).toUpperCase();
-                accInfo.innerHTML = '<div class="account-row">'
-                    + '<div class="account-avatar">' + initial + '</div>'
-                    + '<div style="flex:1;">'
-                    + '<div style="font-weight:700;font-size:1.1em;">' + name + '</div>'
-                    + '<div style="color:var(--muted);font-size:0.9em;">' + email + '</div>'
-                    + '<div style="color:var(--muted);font-size:0.8em;margin-top:4px;">Role: ' + (user.role || 'customer').toUpperCase() + '</div>'
-                    + '</div>'
+                accInfo.innerHTML = '<div class="list-item">'
+                    + '<div><div class="list-item-title">' + (user.name || user.email || 'User') + '</div>'
+                    + '<div style="color:var(--muted);font-size:0.85em;">' + (user.email || '') + '</div></div>'
                     + '</div>';
             }
         } else {
@@ -354,19 +342,13 @@
             }
             container.innerHTML = arr.map(function(b) {
                 const status = String(b.status || '');
-                const pickup = b.pickupAddress || b.pickup_address || '—';
-                const dest = b.destinationAddress || b.destination_address || '—';
-                const fare = b.finalFare || b.final_fare || b.estimatedFare || b.estimated_fare;
-                const date = b.createdAt || b.created_at;
-                const dateStr = date ? new Date(date).toLocaleDateString() : '';
                 return '<div class="list-item">'
-                    + '<div class="list-item-header"><div class="list-item-title">#' + (b.bookingNumber || b.booking_number || b.id) + '</div>'
+                    + '<div class="list-item-header"><div class="list-item-title">#' + (b.bookingNumber || b.id) + '</div>'
                     + '<span class="badge ' + status + '">' + status.replace(/_/g,' ').toUpperCase() + '</span></div>'
-                    + '<div style="color:var(--muted);font-size:0.85em;margin-top:4px;">'
-                    + '📍 ' + pickup + '<br>🏁 ' + dest
+                    + '<div style="color:var(--muted);font-size:0.85em;">'
+                    + (b.pickupAddress || '—') + ' → ' + (b.destinationAddress || '—')
                     + '</div>'
-                    + (fare ? '<div style="margin-top:8px;font-weight:700;color:var(--primary);">QAR ' + fare + '</div>' : '')
-                    + (dateStr ? '<div style="color:var(--muted);font-size:0.75em;margin-top:4px;">' + dateStr + '</div>' : '')
+                    + (b.finalFare || b.estimatedFare ? '<div style="margin-top:8px;font-weight:600;">QAR ' + (b.finalFare || b.estimatedFare) + '</div>' : '')
                     + '</div>';
             }).join('');
         } catch(e) {
@@ -492,5 +474,14 @@
     // Expose for socket handlers
     window._vraApiFetch = apiFetch;
     window._vraShowToast = showToast;
+
+    // ═══ Empty state action handlers ═══
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('[data-action]');
+        if (!btn) return;
+        const action = btn.getAttribute('data-action');
+        if (action === 'open-vehicle') openModal('vehicle-modal');
+        if (action === 'open-dest') openModal('dest-modal');
+    });
 
 })();

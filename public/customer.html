@@ -14,6 +14,8 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
     <!-- Main stylesheet (Uber-style dark/light) -->
+        <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="/style.css">
 </head>
 <body class="customer-app">
@@ -21,11 +23,11 @@
     <!-- HEADER -->
     <header>
         <div class="container">
-            <div class="brand">🚗 Vehicle Recovery</div>
+            <div class="brand"><img src="/logo.svg" alt="VRA" class="brand-logo" /><span class="brand-text">Vehicle Recovery</span></div>
             <nav>
-                <button id="theme-toggle" onclick="toggleTheme()" title="Toggle theme">🌙</button>
-                <button id="lang-toggle" onclick="toggleLanguage()" title="Switch language">العربية</button>
-                <a href="#" id="logout-btn" onclick="logout(); return false;">Logout</a>
+                <button id="theme-toggle" onclick="toggleTheme()" title="Toggle theme"><i data-lucide="moon" width="16" height="16"></i></button>
+                <button id="lang-toggle" onclick="toggleLanguage()" title="Switch language"><i data-lucide="globe" width="14" height="14"></i> العربية</button>
+                <a href="#" id="logout-btn" onclick="logout(); return false;"><i data-lucide="log-out" width="14" height="14"></i> Logout</a>
             </nav>
         </div>
     </header>
@@ -124,7 +126,7 @@
         <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <h2 style="margin: 0;">🚗 Your Vehicles</h2>
-                <button class="btn secondary small" onclick="openModal('vehicle-modal')">+ Add Vehicle</button>
+                <button class="btn small" onclick="openModal('vehicle-modal')" title="Add Vehicle">+ Add</button>
             </div>
             <div id="vehicles-list" class="list-grid"></div>
         </div>
@@ -133,7 +135,7 @@
         <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <h2 style="margin: 0;">📍 Saved Destinations</h2>
-                <button class="btn secondary small" onclick="openModal('dest-modal')">+ Add Place</button>
+                <button class="btn small" onclick="openModal('dest-modal')" title="Add Place">+ Add</button>
             </div>
             <div id="destinations-list" class="list-grid"></div>
         </div>
@@ -203,16 +205,16 @@
     <!-- BOTTOM NAV (Uber-Style Pill) -->
     <nav class="bottom-nav" id="main-bottom-nav" style="display: none;">
         <button class="nav-item active" id="nav-home" onclick="switchTab('home')">
-            <span class="nav-icon">🏠</span>Home
+            <i data-lucide="home" class="nav-icon" width="20" height="20"></i>Home
         </button>
         <button class="nav-item" id="nav-services" onclick="switchTab('services')">
-            <span class="nav-icon">🛠️</span>Services
+            <i data-lucide="wrench" class="nav-icon" width="20" height="20"></i>Services
         </button>
         <button class="nav-item" id="nav-activity" onclick="switchTab('activity')">
-            <span class="nav-icon">📋</span>Activity
+            <i data-lucide="list" class="nav-icon" width="20" height="20"></i>Activity
         </button>
         <button class="nav-item" id="nav-account" onclick="switchTab('account')">
-            <span class="nav-icon">👤</span>Account
+            <i data-lucide="user" class="nav-icon" width="20" height="20"></i>Account
         </button>
     </nav>
 
@@ -278,5 +280,14 @@
     <script src="/socket.io/socket.io.js"></script>
     <!-- Main app logic -->
     <script src="/app.js"></script>
+    <script>
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+            document.addEventListener('DOMContentLoaded', () => {
+                setTimeout(() => lucide.createIcons(), 100);
+                setInterval(() => lucide.createIcons(), 1000);
+            });
+        }
+    </script>
 </body>
 </html>
