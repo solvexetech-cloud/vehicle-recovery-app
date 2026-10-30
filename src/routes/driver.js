@@ -272,6 +272,29 @@ function routes(db) {
     } catch (e) { next(e); }
   });
 
+
+  // ---- earnings ----
+  r.get('/earnings', (req, res, next) => {
+    try {
+      const driver = getDriver(req.user.id);
+      if (!driver) return next(Errors.notFound('driver_profile_not_found'));
+      
+      let balance = 0;
+      try {
+        const wallet = db.prepare('SELECT balance FROM driver_wallets WHERE driver_id = ?').get(driver.id);
+        if (wallet && wallet.balance) balance = wallet.balance;
+      } catch (e) { /* wallet table issue - ignore */ }
+      
+      res.json({
+        today: 0,
+        week: 0,
+        total: balance,
+        todayRides: 0,
+        walletBalance: balance
+      });
+    } catch (e) { next(e); }
+  });
+
   return r;
 }
 

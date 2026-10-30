@@ -1,439 +1,208 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Driver - Vehicle Recovery</title>
-  <link rel="stylesheet" href="style.css">
-  <style>
-    /* =========================================
-       DRIVER APP SPECIFIC THEME OVERRIDES
-       ========================================= */
-    body.driver-app {
-      --primary: #00B4D8; /* പ്രീമിയം സിയാൻ ബ്ലൂ (Dark Mode) */
-      --primary-text: #000000;
-    }
-    body.driver-app[data-theme="light"] {
-      --primary: #0077B6; /* ഡാർക്കർ ബ്ലൂ (Light Mode) */
-      --primary-text: #FFFFFF;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vehicle Recovery - Driver</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#B8FF00">
+    <link rel="icon" type="image/png" href="/icon-192.png">
 
-    /* ഇൻപുട്ട് ഫോക്കസ് ബോർഡർ ബ്ലൂ ആക്കുന്നു */
-    body.driver-app .form-group input:focus, 
-    body.driver-app .form-group select:focus {
-      border-color: var(--primary) !important;
-      box-shadow: 0 0 0 2px rgba(0, 180, 216, 0.2) !important;
-    }
-    body.driver-app[data-theme="light"] .form-group input:focus, 
-    body.driver-app[data-theme="light"] .form-group select:focus {
-      box-shadow: 0 0 0 2px rgba(0, 119, 182, 0.2) !important;
-    }
+    <!-- Leaflet Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    /* കാർഡുകൾക്കും ബോർഡറുകൾക്കും ബ്ലൂ ടച്ച് നൽകുന്നു */
-    body.driver-app .card, 
-    body.driver-app .info-bar, 
-    body.driver-app .list-item {
-      border-color: rgba(0, 180, 216, 0.25) !important;
-    }
-    body.driver-app[data-theme="light"] .card, 
-    body.driver-app[data-theme="light"] .info-bar, 
-    body.driver-app[data-theme="light"] .list-item {
-      border-color: var(--border) !important;
-    }
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 
-    /* ചെറിയ ബട്ടണുകൾക്കും ബ്ലൂ ബോർഡർ */
-    body.driver-app .btn.small, 
-    body.driver-app .btn.secondary, 
-    body.driver-app .list-item .btn {
-      border-color: var(--primary) !important;
-      color: var(--fg) !important;
-    }
-    body.driver-app .timeline li::before { background: var(--primary); }
-  </style>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
-  <!-- PWA -->
-  <link rel="manifest" href="/manifest.json" />
-  <meta name="theme-color" content="#84cc16" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Recovery" />
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
-  <script src="/socket.io/socket.io.js"></script>
+    <!-- Main stylesheet (reuse customer premium theme) -->
+    <link rel="stylesheet" href="/style.css">
 </head>
-<body class="driver-app">
+<body class="customer-app driver-app">
 
-  <header>
-    <div class="container">
-      <div class="brand" data-i18n="app.title">Driver App</div>
-      <nav>
-        <button id="lang-toggle">العربية</button>
-        <button id="theme-toggle">🌙</button>
-        <a href="#" id="logout-btn" data-i18n="nav.logout">Logout</a>
-      </nav>
-    </div>
-  </header>
-
-  <main class="container">
-    <div id="country-info" class="info-bar">Driver: John Doe · ⭐ 4.9 · 1 vehicles</div>
-
-    <!-- ================= DASHBOARD SCREEN ================= -->
-    <section id="screen-dashboard" class="screen active">
-      <div class="grid">
-        
-        <!-- Status Toggle -->
-        <div class="card" style="display: flex; justify-content: space-between; align-items: center;">
-          <div>
-            <h2 style="margin: 0; font-size: 1.1em;" data-i18n="driver.status">Status</h2>
-            <p id="status-text" style="color: var(--danger); font-weight: 700; margin-top: 4px;">Offline</p>
-          </div>
-          <button id="status-toggle-btn" class="btn" style="width: auto; padding: 10px 20px; margin: 0;">Go Online</button>
-        </div>
-
-        <!-- Incoming Offer (Hidden initially) -->
-        <div class="card" id="incoming-offer" style="display: none; border-color: var(--primary); box-shadow: 0 0 15px rgba(0, 180, 216, 0.2);">
-          <h2>🔔 New Towing Request</h2>
-          <div class="list-item" style="background: transparent; border: none; padding: 0;">
-            <div class="list-item-header">
-              <span class="list-item-title" style="color: var(--primary);">Est. 85.00 QAR</span>
-              <span class="badge created">New</span>
+    <!-- HEADER -->
+    <header>
+        <div class="container">
+            <div class="brand">
+                <img src="/logo.svg" alt="VRA" class="brand-logo" />
+                <span class="brand-text">Driver</span>
             </div>
-            <p style="font-size: 0.85em; color: var(--muted); margin: 8px 0;">
-              📍 Pickup: <span style="color: var(--fg);">Al Wakrah</span><br>
-              🏁 Drop: <span style="color: var(--fg);">Salwa Road</span><br>
-              🚗 Vehicle: <span style="color: var(--fg);">Toyota Land Cruiser</span>
+            <nav>
+                <button id="theme-toggle" onclick="toggleTheme()" title="Toggle theme"><i data-lucide="moon" width="16" height="16"></i></button>
+                <button id="lang-toggle" onclick="toggleLanguage()" title="Switch language"><i data-lucide="globe" width="14" height="14"></i> العربية</button>
+                <a href="#" id="logout-btn" onclick="logout(); return false;"><i data-lucide="log-out" width="14" height="14"></i> Logout</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen" class="container" style="display: none; padding-top: 40px;">
+        <div class="card" style="max-width: 400px; margin: 0 auto;">
+            <h2 style="text-align:center; margin-bottom: 24px;">Driver Sign In</h2>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="login-email" placeholder="driver1@example.com" autocomplete="email">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
+            </div>
+            <button class="btn" onclick="login()">Sign In</button>
+            <p style="text-align:center; color: var(--muted); font-size: 0.8em; margin-top: 16px;">
+                Demo: driver1@example.com / DriverPass1234
             </p>
-            <div class="form-row" style="margin-top: 16px;">
-              <button id="btn-decline" class="btn secondary">Decline</button>
-              <button id="btn-accept" class="btn">Accept</button>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="app-main" style="display: none;">
+
+    <!-- HOME TAB -->
+    <main id="tab-home" class="container screen active" style="padding-top: 20px; padding-bottom: 120px;">
+
+        <!-- ONLINE/OFFLINE TOGGLE (big card) -->
+        <div class="card" style="padding: 24px; text-align: center;">
+            <div id="online-status-text" style="font-size: 0.9em; color: var(--muted); margin-bottom: 12px;">
+                Ready to accept rides
             </div>
-          </div>
+            <button id="online-toggle" class="btn" style="font-size: 1.1em; padding: 20px; min-height: 70px;" onclick="toggleOnline()">
+                <span style="display: flex; align-items: center; gap: 10px;">
+                    <i data-lucide="power" width="22" height="22"></i>
+                    <span id="online-toggle-label">Go Online</span>
+                </span>
+            </button>
+            <div id="status-badge" style="margin-top: 12px; font-size: 0.8em; color: var(--muted);">
+                Status: <span id="current-status">Offline</span>
+            </div>
         </div>
 
-        <!-- Active Trip (Hidden initially) -->
-        <div class="card" id="active-trip" style="display: none; border-color: var(--success);">
-          <h2>🚨 Active Trip</h2>
-          <div class="list-item" style="background: transparent; border: none; padding: 0;">
-            <div class="list-item-header">
-              <span class="list-item-title">Customer: Jamshi</span>
-              <span class="badge assigned">In Progress</span>
+        <!-- INCOMING OFFER CARD (hidden by default) -->
+        <div id="offer-panel" class="card" style="display: none; border: 2px solid var(--primary) !important; box-shadow: 0 8px 32px var(--primary-glow) !important;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h2 style="margin: 0;">🚨 New Offer!</h2>
+                <div id="offer-timer" style="font-size: 1.5em; font-weight: 800; color: var(--primary);">20s</div>
             </div>
-            <ul class="timeline">
-              <li class="completed">Arrived at Pickup</li>
-              <li>Loading Vehicle...</li>
-              <li>Head to Destination</li>
-            </ul>
-            <button class="btn" style="margin-top: 16px; background: var(--success); color: #000;">Complete Trip</button>
-          </div>
+            <div id="offer-details" style="font-size: 0.9em; color: var(--muted); margin-bottom: 16px;"></div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn danger" style="flex: 1;" onclick="rejectCurrentOffer()">Reject</button>
+                <button class="btn" style="flex: 1;" onclick="acceptCurrentOffer()">Accept</button>
+            </div>
         </div>
 
-        <!-- Today's Earnings -->
+        <!-- ACTIVE TRIP CARD (hidden by default) -->
+        <div id="active-trip-panel" class="card" style="display: none; border: 2px solid var(--primary) !important;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <h2 style="margin: 0;">🚗 Active Trip</h2>
+                <span id="active-trip-status" class="badge assigned">ASSIGNED</span>
+            </div>
+            <div id="active-trip-info" style="font-size: 0.9em; color: var(--muted); margin-bottom: 16px;"></div>
+            <button class="btn" onclick="switchTab('trip')">View Trip Details →</button>
+        </div>
+
+        <!-- TODAY'S SUMMARY -->
         <div class="card">
-          <h2 data-i18n="driver.summary">💰 Today's Summary</h2>
-          <div class="form-row">
-            <div class="list-item" style="text-align: center; flex: 1; padding: 16px;">
-              <div style="font-size: 0.75em; color: var(--muted); text-transform: uppercase; font-weight: 600; margin-bottom: 4px;" data-i18n="driver.trips">Trips</div>
-              <div style="font-size: 1.5em; font-weight: 800;">4</div>
+            <h2>📊 Today's Summary</h2>
+            <div style="display: flex; gap: 12px;">
+                <div style="flex: 1; text-align: center; padding: 12px; background: var(--input-bg); border-radius: 12px;">
+                    <div style="font-size: 1.5em; font-weight: 800; color: var(--primary);" id="today-rides">0</div>
+                    <div style="font-size: 0.75em; color: var(--muted); text-transform: uppercase;">Rides</div>
+                </div>
+                <div style="flex: 1; text-align: center; padding: 12px; background: var(--input-bg); border-radius: 12px;">
+                    <div style="font-size: 1.5em; font-weight: 800; color: var(--primary);" id="today-earnings">QAR 0</div>
+                    <div style="font-size: 0.75em; color: var(--muted); text-transform: uppercase;">Earned</div>
+                </div>
             </div>
-            <div class="list-item" style="text-align: center; flex: 1; padding: 16px;">
-              <div style="font-size: 0.75em; color: var(--muted); text-transform: uppercase; font-weight: 600; margin-bottom: 4px;" data-i18n="driver.earnings">Earnings</div>
-              <div style="font-size: 1.5em; font-weight: 800; color: var(--primary);">340 QAR</div>
+        </div>
+    </main>
+
+    <!-- TRIP TAB -->
+    <main id="tab-trip" class="container screen" style="padding-top: 20px; padding-bottom: 120px;">
+        <div id="trip-content">
+            <div class="card">
+                <h2>🚗 No Active Trip</h2>
+                <p style="color: var(--muted); text-align: center; padding: 20px;">
+                    Go online to receive offers
+                </p>
             </div>
-          </div>
         </div>
+    </main>
 
-      </div>
-    </section>
-
-    <!-- ================= HISTORY SCREEN ================= -->
-    <section id="screen-history" class="screen">
-      <div class="card">
-        <h2>📋 Trip History</h2>
-        <div class="list-grid">
-          <div class="list-item">
-            <div class="list-item-header">
-              <span class="list-item-title">Flat Tire - Al Sadd</span>
-              <span class="badge trip_completed">Completed</span>
+    <!-- EARNINGS TAB -->
+    <main id="tab-earnings" class="container screen" style="padding-top: 20px; padding-bottom: 120px;">
+        <div class="card">
+            <h2>💰 Earnings</h2>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="padding: 16px; background: var(--input-bg); border-radius: 12px; display: flex; justify-content: space-between;">
+                    <span style="color: var(--muted);">Today</span>
+                    <span style="font-weight: 800;" id="earnings-today">QAR 0</span>
+                </div>
+                <div style="padding: 16px; background: var(--input-bg); border-radius: 12px; display: flex; justify-content: space-between;">
+                    <span style="color: var(--muted);">This Week</span>
+                    <span style="font-weight: 800;" id="earnings-week">QAR 0</span>
+                </div>
+                <div style="padding: 16px; background: linear-gradient(135deg, var(--primary), #A8E600); border-radius: 12px; display: flex; justify-content: space-between; color: #0A0A0A;">
+                    <span style="font-weight: 700;">Total</span>
+                    <span style="font-weight: 800;" id="earnings-total">QAR 0</span>
+                </div>
             </div>
-            <p style="font-size: 0.8em; color: var(--muted); margin-top: 4px;">QAR 45.00 · 2:30 PM</p>
-          </div>
-          <div class="list-item">
-            <div class="list-item-header">
-              <span class="list-item-title">Jumpstart - West Bay</span>
-              <span class="badge trip_completed">Completed</span>
+        </div>
+        <div class="card">
+            <h2>📋 Recent Trips</h2>
+            <div id="trip-history" class="list-grid">
+                <div class="empty-compact">
+                    <div class="empty-compact-icon">📋</div>
+                    <div class="empty-compact-body">
+                        <div class="empty-compact-title">No trips yet</div>
+                        <div class="empty-compact-sub">Trips will appear here</div>
+                    </div>
+                </div>
             </div>
-            <p style="font-size: 0.8em; color: var(--muted); margin-top: 4px;">QAR 60.00 · 11:15 AM</p>
-          </div>
         </div>
-      </div>
-    </section>
+    </main>
 
-    <!-- ================= PROFILE SCREEN ================= -->
-    <section id="screen-profile" class="screen">
-      <div class="card">
-        <h2>👤 Driver Profile</h2>
-        <div class="list-item" style="margin-bottom: 12px;">
-          <div class="list-item-title">Personal Details</div>
+    <!-- ACCOUNT TAB -->
+    <main id="tab-account" class="container screen" style="padding-top: 20px; padding-bottom: 120px;">
+        <div class="card">
+            <h2>👤 Account</h2>
+            <div id="account-info"></div>
         </div>
-        <div class="list-item" style="margin-bottom: 12px;">
-          <div class="list-item-title">Vehicle Documents</div>
+        <div class="card">
+            <h2>⚙️ Settings</h2>
+            <button class="btn secondary" onclick="toggleTheme()" style="margin-bottom: 10px; width: 100%; justify-content: flex-start; gap: 12px;">🌙 Toggle Theme</button>
+            <button class="btn secondary" onclick="toggleLanguage()" style="margin-bottom: 10px; width: 100%; justify-content: flex-start; gap: 12px;">🌐 Switch Language</button>
+            <button class="btn danger" onclick="logout()" style="width: 100%; justify-content: flex-start; gap: 12px;">🚪 Logout</button>
         </div>
-        <div class="list-item">
-          <div class="list-item-title" style="color: var(--danger);">Support</div>
-        </div>
-      </div>
-    </section>
+    </main>
 
-  </main>
+    </div>
 
-  <!-- ================= BOTTOM NAVIGATION ================= -->
-  <nav class="bottom-nav">
-    <a href="#" class="nav-item active" onclick="switchTab('dashboard', event)">
-      <span class="nav-icon">🏠</span>
-      <span data-i18n="nav.dashboard">Dashboard</span>
-    </a>
-    <a href="#" class="nav-item" onclick="switchTab('history', event)">
-      <span class="nav-icon">📋</span>
-      <span data-i18n="nav.history">History</span>
-    </a>
-    <a href="#" class="nav-item" onclick="switchTab('profile', event)">
-      <span class="nav-icon">👤</span>
-      <span data-i18n="nav.profile">Profile</span>
-    </a>
-  </nav>
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav" id="main-bottom-nav" style="display: none;">
+        <button class="nav-item active" id="nav-home" onclick="switchTab('home')">
+            <i data-lucide="home" class="nav-icon" width="20" height="20"></i>Home
+        </button>
+        <button class="nav-item" id="nav-trip" onclick="switchTab('trip')">
+            <i data-lucide="car" class="nav-icon" width="20" height="20"></i>Trip
+        </button>
+        <button class="nav-item" id="nav-earnings" onclick="switchTab('earnings')">
+            <i data-lucide="dollar-sign" class="nav-icon" width="20" height="20"></i>Earnings
+        </button>
+        <button class="nav-item" id="nav-account" onclick="switchTab('account')">
+            <i data-lucide="user" class="nav-icon" width="20" height="20"></i>Account
+        </button>
+    </nav>
 
-  <script src="theme.js"></script>
-  <script src="i18n.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/driver.js"></script>
 
-  <!-- Driver Demo Logic -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const statusText = document.getElementById('status-text');
-      const toggleBtn = document.getElementById('status-toggle-btn');
-      const incomingOffer = document.getElementById('incoming-offer');
-      const activeTrip = document.getElementById('active-trip');
-      const btnAccept = document.getElementById('btn-accept');
-      const btnDecline = document.getElementById('btn-decline');
-
-      let isOnline = false;
-
-      // Toggle Online/Offline
-      toggleBtn.addEventListener('click', () => {
-        isOnline = !isOnline;
-        if (isOnline) {
-          statusText.textContent = 'Online';
-          statusText.style.color = 'var(--success)';
-          toggleBtn.textContent = 'Go Offline';
-          toggleBtn.className = 'btn secondary';
-          toggleBtn.style.width = 'auto';
-          toggleBtn.style.padding = '10px 20px';
-          
-          // Simulate incoming offer after 3 seconds
-          setTimeout(() => {
-            if(isOnline) incomingOffer.style.display = 'block';
-          }, 3000);
-        } else {
-          statusText.textContent = 'Offline';
-          statusText.style.color = 'var(--danger)';
-          toggleBtn.textContent = 'Go Online';
-          toggleBtn.className = 'btn';
-          toggleBtn.style.width = 'auto';
-          toggleBtn.style.padding = '10px 20px';
-          
-          incomingOffer.style.display = 'none';
-          activeTrip.style.display = 'none';
-        }
-      });
-
-      // Accept Offer
-            btnAccept.addEventListener('click', () => {
-        incomingOffer.style.display = 'none';
-        activeTrip.style.display = 'block';
-        
-        // Active Trip Map Load
-        const activeMapEl = document.getElementById('driver-active-map');
-        if (activeMapEl && !activeMapEl._leaflet_id) {
-            activeMapEl.style.display = 'block';
-            const activeMap = L.map('driver-active-map').setView([25.2854, 51.5310], 14);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap'
-            }).addTo(activeMap);
-            
-            L.marker([25.2854, 51.5310]).addTo(activeMap).bindPopup('Customer Pickup');
-            
-            L.Routing.control({
-                waypoints: [
-                    L.latLng(25.2854, 51.5310),
-                    L.latLng(25.2500, 51.5500)
-                ],
-                show: false,
-                addWaypoints: false
-            }).addTo(activeMap);
-        }
-      });
-
-      // Decline Offer
-      btnDecline.addEventListener('click', () => {
-        incomingOffer.style.display = 'none';
-      });
-    });
-
-    // Tab Switching Logic
-    function switchTab(tabName, event) {
-      if (event) event.preventDefault();
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      
-      const targetScreen = document.getElementById(`screen-${tabName}`);
-      if (targetScreen) targetScreen.classList.add('active');
-      if (event && event.currentTarget) event.currentTarget.classList.add('active');
-      
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  </script>
-    <!-- SAFE LIVE TRACKING INJECTION -->
     <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        const buttons = document.querySelectorAll('button');
-        let acceptBtn = null;
-        buttons.forEach(b => {
-            if (b.textContent.trim().toLowerCase() === 'accept') acceptBtn = b;
-        });
-
-        if (acceptBtn) {
-            acceptBtn.addEventListener('click', () => {
-                setTimeout(() => {
-                    let mapEl = document.getElementById('driver-active-map');
-                    
-                    if (!mapEl) {
-                        mapEl = document.createElement('div');
-                        mapEl.id = 'driver-active-map';
-                        mapEl.style.cssText = 'height: 180px; border-radius: 12px; margin: 12px 0; display: block; z-index: 1;';
-                        
-                        const cards = document.querySelectorAll('.card');
-                        for (let c of cards) {
-                            if (c.textContent.includes('Active Trip')) {
-                                c.insertBefore(mapEl, c.children[1] || c.firstChild);
-                                break;
-                            }
-                        }
-                    }
-                    mapEl.style.display = 'block';
-
-                    if (!mapEl._leaflet_id && typeof L !== 'undefined') {
-                        const activeMap = L.map('driver-active-map').setView([25.2854, 51.5310], 14);
-                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(activeMap);
-                        L.marker([25.2854, 51.5310]).addTo(activeMap).bindPopup('Customer Pickup');
-                        L.Routing.control({
-                            waypoints: [L.latLng(25.2854, 51.5310), L.latLng(25.2500, 51.5500)],
-                            show: false, addWaypoints: false
-                        }).addTo(activeMap);
-                    }
-
-                    if (typeof io !== 'undefined') {
-                        const socket = io();
-                        const currentBookingId = 'trip_123';
-                        socket.emit('join_trip', { bookingId: currentBookingId, role: 'driver' });
-                        console.log('[Driver] Joined trip_' + currentBookingId);
-
-                        let step = 0;
-                        const interval = setInterval(() => {
-                            step += 0.0001;
-                            const newLat = 25.2800 + step;
-                            const newLng = 51.5400;
-                            socket.emit('driver_location', { bookingId: currentBookingId, lat: newLat, lng: newLng });
-                            console.log('[Driver] Emitted location:', newLat.toFixed(4), newLng.toFixed(4));
-                            
-                            if (step > 0.005) {
-                                clearInterval(interval);
-                                socket.emit('driver_arrived', { bookingId: currentBookingId });
-                                console.log('[Driver] Arrived!');
-                            }
-                        }, 2000);
-                    }
-                }, 500); 
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+            document.addEventListener('DOMContentLoaded', () => {
+                setTimeout(() => lucide.createIcons(), 100);
+                setInterval(() => lucide.createIcons(), 1500);
             });
         }
-      });
     </script>
-    <!-- Wallet Section -->
-    <div id="wallet-section" style="display: none; padding: 20px;">
-        <h2 style="margin-bottom: 20px;">My Wallet</h2>
-        <div class="card" style="text-align: center; margin-bottom: 20px;">
-            <p style="color: #666; margin-bottom: 10px;">Available Balance</p>
-            <h1 id="wallet-balance" style="font-size: 36px; color: #84cc16;">0.00 QAR</h1>
-            <p id="wallet-warning" style="color: #ef4444; font-size: 12px; margin-top: 10px; display: none;">⚠️ Negative balance! Please top up to go online.</p>
-        </div>
-        <h3 style="margin-bottom: 15px;">Recent Transactions</h3>
-        <div id="wallet-transactions" class="list-grid"></div>
-    </div>
-<script>
-    let walletData = { enabled: false, balance: 0 };
-
-    async function loadWalletData() {
-        try {
-            // Assuming driver ID 1 for now (replace with actual logged-in user ID)
-            const res = await fetch('/api/wallet/driver/1'); 
-            walletData = await res.json();
-            
-            // Show/Hide Tab based on Admin Toggle
-            const tabWallet = document.getElementById('tab-wallet');
-            if (tabWallet) tabWallet.style.display = walletData.wallet_enabled ? 'flex' : 'none';
-
-            // Update UI
-            const balanceEl = document.getElementById('wallet-balance');
-            if (balanceEl) {
-                balanceEl.textContent = `${walletData.balance.toFixed(2)} QAR`;
-                balanceEl.style.color = walletData.balance < 0 ? '#ef4444' : '#84cc16';
-            }
-
-            const warningEl = document.getElementById('wallet-warning');
-            if (warningEl) warningEl.style.display = walletData.balance < -50 ? 'block' : 'none';
-
-            // Render Transactions
-            const txContainer = document.getElementById('wallet-transactions');
-            if (txContainer) {
-                txContainer.innerHTML = walletData.transactions.map(tx => `
-                    <div class="list-item" style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;">
-                        <div>
-                            <strong style="color:${tx.type === 'DEBIT' ? '#ef4444' : '#22c55e'}">${tx.type}</strong>
-                            <div style="font-size:12px; color:#666;">${tx.description}</div>
-                        </div>
-                        <div style="font-weight:bold; color:${tx.type === 'DEBIT' ? '#ef4444' : '#22c55e'}">${tx.amount} QAR</div>
-                    </div>
-                `).join('');
-            }
-        } catch(e) { console.error('Wallet load error:', e); }
-    }
-
-    // Block Go Online if balance < -50
-    const originalGoOnline = document.getElementById('btnGoOnline');
-    if (originalGoOnline) {
-        originalGoOnline.addEventListener('click', async (e) => {
-            if (walletData.enabled && walletData.balance < -50) {
-                e.preventDefault();
-                e.stopPropagation();
-                alert('🚫 Cannot go online! Your wallet balance is below -50 QAR. Please contact Admin.');
-                return false;
-            }
-        }, true); // Use capture phase to run before original listener
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        loadWalletData();
-        // Refresh wallet every 30 seconds
-        setInterval(loadWalletData, 30000);
-    });
-</script>
 </body>
 </html>
-
-
-
-
-
-
-
-
