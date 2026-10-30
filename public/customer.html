@@ -6,265 +6,277 @@
     <title>Vehicle Recovery - Customer</title>
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#84cc16">
+    <link rel="icon" type="image/png" href="/icon-192.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     
-    <!-- Leaflet Maps & Socket.io -->
+    <!-- Leaflet Maps -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
     
-    <style>
-        :root {
-            --lime: #84cc16;
-            --dark: #0a0a0a;
-            --bg: #f4f6f8;
-            --card: #ffffff;
-            --fg: #1a1a1a;
-            --muted: #6b7280;
-            --border: #e5e7eb;
-        }
-        * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
-        body { background: var(--bg); margin: 0; padding-bottom: 80px; color: var(--fg); }
-        
-        /* Header */
-        header { background: var(--card); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
-        .logo { display: flex; align-items: center; gap: 12px; }
-        .logo img { width: 36px; height: 36px; border-radius: 10px; }
-        .logo h1 { font-size: 20px; margin: 0; font-weight: 800; letter-spacing: -0.5px; }
-        
-        /* Main Container */
-        main { max-width: 600px; margin: 20px auto; padding: 0 15px; }
-        
-        /* Cards */
-        .card { background: var(--card); border-radius: 16px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); margin-bottom: 20px; }
-        .card h2 { margin-top: 0; margin-bottom: 15px; font-size: 18px; }
-        
-        /* Inputs */
-        .input-group { display: flex; align-items: center; background: #f3f4f6; border-radius: 10px; padding: 12px 15px; margin-bottom: 12px; border: 2px solid transparent; transition: 0.3s; }
-        .input-group:focus-within { border-color: var(--lime); }
-        .input-group input { border: none; background: transparent; width: 100%; outline: none; font-size: 15px; color: var(--fg); }
-        .input-group span { font-size: 18px; margin-right: 10px; }
-        
-        /* Buttons */
-        .btn { width: 100%; padding: 15px; font-size: 16px; font-weight: 700; border-radius: 10px; background: var(--lime); color: var(--dark); border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(132,204,22,0.3); }
-        .btn-outline { background: #e5e7eb; color: var(--fg); box-shadow: none; width: auto; padding: 8px 14px; font-size: 13px; border-radius: 20px; }
-        
-        /* Map Container */
-        #map-container { height: 200px; width: 100%; border-radius: 12px; margin-top: 15px; z-index: 1; border: 1px solid var(--border); }
-        
-        /* List Items */
-        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #f9fafb; border-radius: 10px; margin-bottom: 10px; }
-        .list-item strong { display: block; font-size: 15px; }
-        .list-item span { font-size: 13px; color: var(--muted); }
-        .btn-delete { background: #fee2e2; color: #ef4444; border: none; padding: 8px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 12px; }
-        
-        /* Modals */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; }
-        .modal-content { background: #fff; border-radius: 16px; width: 90%; max-width: 400px; padding: 25px; }
-        .modal-content input { width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 10px; border: 1px solid var(--border); background: #f9fafb; font-size: 15px; }
-        
-        /* Bottom Nav */
-        nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--card); box-shadow: 0 -2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-around; padding: 12px 0; z-index: 100; }
-        nav a { display: flex; flex-direction: column; align-items: center; color: var(--muted); text-decoration: none; font-size: 12px; font-weight: bold; }
-        nav a.active { color: var(--lime); }
-        nav a span { font-size: 22px; margin-bottom: 4px; }
-        
-        /* Live Tracking Overlay */
-        #live-tracking-container { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99999; background: #fff; }
-        #live-tracking-map { width: 100%; height: 100%; }
-    </style>
-<link rel="icon" type="image/png" href="/icon-192.png">`n<style>
-    /* Uber-Style Fixed Bottom Nav */
-    .bottom-nav {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background: #ffffff;
-        border-top: 1px solid #e5e7eb;
-        display: flex;
-        justify-content: space-around;
-        padding: 10px 0;
-        z-index: 1000;
-        box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-    }
-    .nav-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        color: #6b7280;
-        text-decoration: none;
-        font-size: 12px;
-        font-weight: 600;
-        cursor: pointer;
-        background: none;
-        border: none;
-    }
-    .nav-item.active {
-        color: #84cc16;
-    }
-    .nav-item .icon {
-        font-size: 20px;
-        margin-bottom: 4px;
-    }
-</style>
+    <!-- Main stylesheet (Uber-style dark/light) -->
+    <link rel="stylesheet" href="/style.css">
 </head>
-<body>
-    <main id="tab-services" style="display: none; max-width: 600px; margin: 20px auto; padding: 0 15px;">
-        <div style="background:#fff; border-radius:16px; padding:30px; text-align:center; box-shadow:0 4px 20px rgba(0,0,0,0.06);">
-            <h2 style="margin-top:0;">🛠️ Services</h2>
-            <p style="color:#6b7280;">Service selection coming soon.</p>
-        </div>
-    </main>
-    <main id="tab-activity" style="display: none; max-width: 600px; margin: 20px auto; padding: 0 15px;">
-        <div style="background:#fff; border-radius:16px; padding:30px; text-align:center; box-shadow:0 4px 20px rgba(0,0,0,0.06);">
-            <h2 style="margin-top:0;">📋 Activity</h2>
-            <p style="color:#6b7280;">Your booking history will appear here.</p>
-        </div>
-    </main>
-    <main id="tab-account" style="display: none; max-width: 600px; margin: 20px auto; padding: 0 15px;">
-        <div style="background:#fff; border-radius:16px; padding:30px; text-align:center; box-shadow:0 4px 20px rgba(0,0,0,0.06);">
-            <h2 style="margin-top:0;">👤 Account</h2>
-            <p style="color:#6b7280;">Profile settings coming soon.</p>
-        </div>
-    </main>
+<body class="customer-app">
 
+    <!-- HEADER -->
     <header>
-        <div class="logo">
-            <img src="/icon-192.png" alt="Logo">
-            <h1>Vehicle Recovery</h1>
-        </div>
-        <div style="display: flex; gap: 10px; align-items: center;">
-            <button style="background: #fff; border: 1px solid var(--border); padding: 6px 12px; border-radius: 20px; font-weight: 600; cursor: pointer;">العربية</button>
-            <button style="background: #fee2e2; color: #ef4444; border: none; padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 14px; cursor: pointer;">Logout</button>
+        <div class="container">
+            <div class="brand">🚗 Vehicle Recovery</div>
+            <nav>
+                <button id="theme-toggle" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+                <button id="lang-toggle" onclick="toggleLanguage()" title="Switch language">العربية</button>
+                <a href="#" id="logout-btn" onclick="logout(); return false;">Logout</a>
+            </nav>
         </div>
     </header>
 
-    <main id="tab-home">
+    <!-- LOGIN SCREEN (shown if not logged in) -->
+    <div id="login-screen" class="container" style="display: none; padding-top: 40px;">
+        <div class="card" style="max-width: 400px; margin: 0 auto;">
+            <h2 style="text-align:center; margin-bottom: 24px;">Sign In</h2>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="login-email" placeholder="demo1@example.com" autocomplete="email">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
+            </div>
+            <button class="btn" onclick="login()">Sign In</button>
+            <p style="text-align:center; color: var(--muted); font-size: 0.85em; margin-top: 16px;">
+                Demo: demo1@example.com / DemoPass1234
+            </p>
+        </div>
+    </div>
+
+    <!-- MAIN APP (shown if logged in) -->
+    <div id="app-main" style="display: none;">
+
+    <!-- HOME TAB -->
+    <main id="tab-home" class="container screen active" style="padding-top: 20px; padding-bottom: 120px;">
+        
+        <!-- ACTIVE BOOKING PANEL (shown when trip active) -->
+        <div id="active-booking-panel" class="card" style="display: none; border-color: var(--primary) !important; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <h2 style="margin: 0;">🚨 Active Recovery</h2>
+                <span id="active-booking-status" class="badge assigned">ASSIGNED</span>
+            </div>
+            <div id="active-booking-info" style="font-size: 0.9em; color: var(--muted); margin-bottom: 12px;"></div>
+            <div style="display: flex; gap: 8px;">
+                <button class="btn" style="flex:1;" onclick="openLiveTracking()">📡 Track Driver</button>
+                <button class="btn danger" style="flex:1;" onclick="cancelActiveBooking()">Cancel</button>
+            </div>
+        </div>
+
+        <!-- NEW RECOVERY CARD -->
         <div class="card">
             <h2>🚨 New Recovery</h2>
             
-            <label style="font-size: 12px; color: var(--muted); display: block; margin-bottom: 5px;">PICKUP LOCATION</label>
-            <div class="input-group">
+            <div class="form-group">
+                <label>Service Type</label>
+                <select id="service-type">
+                    <option value="towing">Towing / Breakdown Recovery</option>
+                    <option value="accident">Accident Recovery</option>
+                    <option value="flatbed_transport">Flatbed Vehicle Transport</option>
+                    <option value="jump_start">Battery Jump Start</option>
+                    <option value="tyre_change">Tyre Change</option>
+                    <option value="fuel_delivery">Fuel Delivery</option>
+                    <option value="lockout">Lockout Assistance</option>
+                    <option value="winching">Winching</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Pickup Location</label>
                 <input type="text" id="pickup-loc" placeholder="e.g. Doha, Industrial Area">
             </div>
             
-            <label style="font-size: 12px; color: var(--muted); display: block; margin-bottom: 5px;">DESTINATION</label>
-            <div class="input-group">
+            <div class="form-group">
+                <label>Destination</label>
                 <input type="text" id="dest-loc" placeholder="e.g. Garage, Salwa Road">
             </div>
             
-            <label style="font-size: 12px; color: var(--muted); display: block; margin-bottom: 5px;">YOUR VEHICLE REGISTRATION</label>
-            <div class="input-group">
+            <div class="form-group">
+                <label>Your Vehicle Registration</label>
                 <input type="text" id="vehicle-reg" placeholder="e.g. QA-12345">
             </div>
 
-            <button class="btn" onclick="console.log('Booking clicked')">Get Estimate & Book</button>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Service Level</label>
+                    <select id="service-level">
+                        <option value="normal">Normal</option>
+                        <option value="fast">Fast (surcharge)</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="btn" onclick="submitBooking()">Get Estimate & Book</button>
             
-            <!-- MAP IS BACK HERE -->
-            <div id="map-container"></div>
+            <!-- Fare Estimate Display -->
+            <div id="fare-estimate" class="info-bar" style="display: none; margin-top: 12px; text-align: left;"></div>
+            
+            <!-- Map -->
+            <div id="map-container" class="map-container"></div>
         </div>
 
+        <!-- VEHICLES CARD -->
         <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <h2 style="margin: 0;">🚗 Your Vehicles</h2>
-                <button class="btn btn-outline" onclick="openModal('vehicle-modal')">+ Add Vehicle</button>
+                <button class="btn secondary small" onclick="openModal('vehicle-modal')">+ Add Vehicle</button>
             </div>
-            <div id="vehicles-list"></div>
+            <div id="vehicles-list" class="list-grid"></div>
         </div>
 
+        <!-- SAVED DESTINATIONS CARD -->
         <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <h2 style="margin: 0;">📍 Saved Destinations</h2>
-                <button class="btn btn-outline" onclick="openModal('dest-modal')">+ Add Place</button>
+                <button class="btn secondary small" onclick="openModal('dest-modal')">+ Add Place</button>
             </div>
-            <div id="destinations-list"></div>
+            <div id="destinations-list" class="list-grid"></div>
         </div>
     </main>
 
-        <!-- Other Tabs (Hidden by default) -->
-    
+    <!-- SERVICES TAB -->
+    <main id="tab-services" class="container screen" style="padding-top: 20px; padding-bottom: 120px;">
+        <div class="card">
+            <h2>🛠️ Services</h2>
+            <p style="color: var(--muted); margin-bottom: 20px;">Select a service to see available options</p>
+            <div class="list-grid">
+                <div class="list-item" onclick="selectService('towing')">
+                    <div class="list-item-title">🚛 Towing</div>
+                    <div style="color: var(--muted); font-size: 0.85em;">Breakdown recovery to your destination</div>
+                </div>
+                <div class="list-item" onclick="selectService('jump_start')">
+                    <div class="list-item-title">🔋 Jump Start</div>
+                    <div style="color: var(--muted); font-size: 0.85em;">Battery jump start service</div>
+                </div>
+                <div class="list-item" onclick="selectService('tyre_change')">
+                    <div class="list-item-title">🛞 Tyre Change</div>
+                    <div style="color: var(--muted); font-size: 0.85em;">Flat tyre replacement</div>
+                </div>
+                <div class="list-item" onclick="selectService('fuel_delivery')">
+                    <div class="list-item-title">⛽ Fuel Delivery</div>
+                    <div style="color: var(--muted); font-size: 0.85em;">Emergency fuel delivery</div>
+                </div>
+                <div class="list-item" onclick="selectService('lockout')">
+                    <div class="list-item-title">🔑 Lockout</div>
+                    <div style="color: var(--muted); font-size: 0.85em;">Unlock your vehicle</div>
+                </div>
+                <div class="list-item" onclick="selectService('winching')">
+                    <div class="list-item-title">⛓️ Winching</div>
+                    <div style="color: var(--muted); font-size: 0.85em;">Recovery winching service</div>
+                </div>
+            </div>
+        </div>
+    </main>
 
-    
+    <!-- ACTIVITY TAB -->
+    <main id="tab-activity" class="container screen" style="padding-top: 20px; padding-bottom: 120px;">
+        <div class="card">
+            <h2>📋 Booking History</h2>
+            <div id="booking-history" class="list-grid">
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+            </div>
+        </div>
+    </main>
 
-    
+    <!-- ACCOUNT TAB -->
+    <main id="tab-account" class="container screen" style="padding-top: 20px; padding-bottom: 120px;">
+        <div class="card">
+            <h2>👤 Account</h2>
+            <div id="account-info"></div>
+        </div>
+        <div class="card">
+            <h2>⚙️ Settings</h2>
+            <button class="btn secondary" onclick="toggleTheme()" style="margin-bottom: 10px; width: 100%; justify-content: flex-start; gap: 12px;">🌙 Toggle Theme</button>
+            <button class="btn secondary" onclick="toggleLanguage()" style="margin-bottom: 10px; width: 100%; justify-content: flex-start; gap: 12px;">🌐 Switch Language</button>
+            <button class="btn danger" onclick="logout()" style="width: 100%; justify-content: flex-start; gap: 12px;">🚪 Logout</button>
+        </div>
+    </main>
 
-        <a href="#" class="active"><span>🏠</span>Home</a>
-        <a href="#"><span>🛠️</span>Services</a>
-        <a href="#"><span>📋</span>Activity</a>
-        <a href="#"><span>👤</span>Account</a>
+    </div> <!-- end app-main -->
+
+    <!-- BOTTOM NAV (Uber-Style Pill) -->
+    <nav class="bottom-nav" id="main-bottom-nav" style="display: none;">
+        <button class="nav-item active" id="nav-home" onclick="switchTab('home')">
+            <span class="nav-icon">🏠</span>Home
+        </button>
+        <button class="nav-item" id="nav-services" onclick="switchTab('services')">
+            <span class="nav-icon">🛠️</span>Services
+        </button>
+        <button class="nav-item" id="nav-activity" onclick="switchTab('activity')">
+            <span class="nav-icon">📋</span>Activity
+        </button>
+        <button class="nav-item" id="nav-account" onclick="switchTab('account')">
+            <span class="nav-icon">👤</span>Account
+        </button>
     </nav>
 
+    <!-- VEHICLE MODAL -->
     <div id="vehicle-modal" class="modal">
         <div class="modal-content">
-            <h3 style="margin-top: 0;">Add New Vehicle</h3>
+            <h3 style="margin-top: 0; margin-bottom: 16px;">Add New Vehicle</h3>
             <input type="text" id="v-make" placeholder="Make (e.g. Toyota)">
             <input type="text" id="v-model" placeholder="Model (e.g. Corolla)">
             <input type="text" id="v-reg" placeholder="Registration (e.g. QA-12345)">
+            <select id="v-category" style="width:100%; padding:12px; margin-bottom:12px; border-radius:10px; border:1px solid var(--border); background:var(--input-bg); color:var(--fg); font-size:15px;">
+                <option value="sedan_hatchback">Sedan / Hatchback</option>
+                <option value="suv">SUV</option>
+                <option value="pickup">Pickup</option>
+                <option value="van">Van</option>
+                <option value="bus">Bus</option>
+                <option value="truck">Truck</option>
+                <option value="heavy_commercial">Heavy Commercial</option>
+                <option value="motorcycle">Motorcycle</option>
+                <option value="three_wheeler">Three Wheeler</option>
+            </select>
             <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px;">
-                <button class="btn btn-outline" onclick="closeModal('vehicle-modal')">Cancel</button>
-                <button class="btn" style="width: auto; padding: 10px 20px;" onclick="saveVehicle()">Save</button>
+                <button class="btn secondary small" onclick="closeModal('vehicle-modal')">Cancel</button>
+                <button class="btn small" onclick="saveVehicle()">Save</button>
             </div>
         </div>
     </div>
 
+    <!-- DESTINATION MODAL -->
     <div id="dest-modal" class="modal">
         <div class="modal-content">
-            <h3 style="margin-top: 0;">Add New Destination</h3>
+            <h3 style="margin-top: 0; margin-bottom: 16px;">Add New Destination</h3>
             <input type="text" id="d-name" placeholder="Name (e.g. My Garage)">
             <input type="text" id="d-address" placeholder="Address (e.g. Salwa Road)">
             <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px;">
-                <button class="btn btn-outline" onclick="closeModal('dest-modal')">Cancel</button>
-                <button class="btn" style="width: auto; padding: 10px 20px;" onclick="saveDestination()">Save</button>
+                <button class="btn secondary small" onclick="closeModal('dest-modal')">Cancel</button>
+                <button class="btn small" onclick="saveDestination()">Save</button>
             </div>
         </div>
     </div>
 
+    <!-- LIVE TRACKING OVERLAY -->
     <div id="live-tracking-container">
-        <button style="position: absolute; top: 20px; right: 20px; z-index: 1000; background: #fff; border: none; padding: 10px 15px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); font-weight: bold; cursor: pointer;" onclick="document.getElementById('live-tracking-container').style.display='none'">❌ Close</button>
-        <div id="live-tracking-map"></div>
+        <button style="position: absolute; top: 20px; right: 20px; z-index: 1000; background: var(--card); border: 1px solid var(--border); color: var(--fg); padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="closeLiveTracking()">❌ Close</button>
+        <div id="live-tracking-map" style="width: 100%; height: 100%;"></div>
     </div>
 
+    <!-- RATING MODAL -->
+    <div id="rating-modal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-top: 0;">Rate Your Experience</h3>
+            <p style="color: var(--muted);">How was your recovery service?</p>
+            <div id="rating-stars" style="display: flex; gap: 8px; justify-content: center; margin: 20px 0; font-size: 2em; cursor: pointer;"></div>
+            <textarea id="rating-comment" placeholder="Optional review..." style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border); background:var(--input-bg); color:var(--fg); min-height:80px; resize:vertical;"></textarea>
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px;">
+                <button class="btn secondary small" onclick="closeModal('rating-modal')">Skip</button>
+                <button class="btn small" onclick="submitRating()">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Socket.io client -->
+    <script src="/socket.io/socket.io.js"></script>
+    <!-- Main app logic -->
     <script src="/app.js"></script>
-    <!-- UBER-STYLE BOTTOM NAV -->
-    
-<style>
-    .app-bottom-nav {
-        position: fixed; bottom: 0; left: 0; width: 100%;
-        background: #ffffff; border-top: 1px solid #e5e7eb;
-        display: flex; justify-content: space-around; padding: 10px 0;
-        z-index: 9999; box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-    }
-    .app-nav-btn {
-        display: flex; flex-direction: column; align-items: center;
-        color: #6b7280; text-decoration: none; font-size: 12px; font-weight: 600;
-        cursor: pointer; background: none; border: none; padding: 5px 15px;
-    }
-    .app-nav-btn.active { color: #84cc16; }
-    .app-nav-btn span { font-size: 20px; margin-bottom: 4px; }
-</style>
-
-
-
-<!-- App.js ഉറപ്പായും ലോഡ് ആക്കുന്നു -->
-<script src="/app.js"></script>
-<style>
-    .app-bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-around; padding: 10px 0; z-index: 9999; }
-    .app-nav-btn { display: flex; flex-direction: column; align-items: center; color: #6b7280; font-size: 12px; font-weight: 600; cursor: pointer; background: none; border: none; padding: 5px 15px; }
-    .app-nav-btn.active { color: #84cc16; }
-    .app-nav-btn span { font-size: 20px; margin-bottom: 4px; }
-</style>
-<nav class="app-bottom-nav">
-    <button class="app-nav-btn active" id="nav-home" onclick="switchTab('home')"><span>🏠</span>Home</button>
-    <button class="app-nav-btn" id="nav-services" onclick="switchTab('services')"><span>🛠️</span>Services</button>
-    <button class="app-nav-btn" id="nav-activity" onclick="switchTab('activity')"><span>📋</span>Activity</button>
-    <button class="app-nav-btn" id="nav-account" onclick="switchTab('account')"><span>👤</span>Account</button>
-</nav>
-<script src="/app.js"></script>
 </body>
 </html>
-
-
-
-
