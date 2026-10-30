@@ -1,0 +1,33 @@
+﻿{
+  "name": "Vehicle Recovery App",
+  "short_name": "Recovery",
+  "description": "On-demand towing and vehicle recovery service in Qatar",
+  "start_url": "/customer.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a0a0a",
+  "theme_color": "#84cc16",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["transport", "utilities", "business"],
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Book Recovery",
+      "short_name": "Book",
+      "url": "/customer.html",
+      "description": "Book a recovery truck"
+    },
+    {
+      "name": "Driver Dashboard",
+      "short_name": "Drive",
+      "url": "/driver.html",
+      "description": "Open driver dashboard"
+    }
+  ]
+}

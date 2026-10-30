@@ -1,209 +1,675 @@
+﻿@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
 :root {
-  --bg: #0f172a;
-  --fg: #e2e8f0;
-  --card: #1e293b;
-  --border: #334155;
-  --primary: #3b82f6;
-  --success: #10b981;
-  --danger: #ef4444;
-  --warning: #f59e0b;
-  --muted: #94a3b8;
-  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --bg: #000000;
+  --card: #121212;
+  --border: #2C2C2E;
+  --primary: #CCFF00;
+  --primary-text: #000000;
+  --success: #34D399;
+  --danger: #FF453A;
+  --warning: #FFD60A;
+  --fg: #FFFFFF;
+  --muted: #8E8E93;
+  --font: 'Inter', -apple-system, sans-serif;
+  --input-bg: #1A1A1A;
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  font-family: var(--font);
-  background: var(--bg);
-  color: var(--fg);
-  line-height: 1.5;
-  min-height: 100vh;
+[data-theme="light"] {
+  --bg: #F2F2F7;
+  --card: #FFFFFF;
+  --border: #E5E5EA;
+  --primary: #65A30D;
+  --primary-text: #FFFFFF;
+  --fg: #1C1C1E;
+  --muted: #8E8E93;
+  --input-bg: #F2F2F7;
 }
-.container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-header {
-  background: var(--card);
-  border-bottom: 1px solid var(--border);
-  padding: 16px 0;
-  margin-bottom: 24px;
-}
-header .container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 20px;
-}
-.brand {
-  font-size: 1.4em;
-  font-weight: 700;
-  color: var(--primary);
-}
-.brand span { color: var(--fg); font-weight: 400; font-size: 0.9em; margin-left: 8px; }
-nav a {
-  color: var(--muted);
-  text-decoration: none;
-  margin-left: 16px;
-  padding: 6px 12px;
-  border-radius: 6px;
-  transition: background 0.2s;
-}
-nav a:hover { background: var(--border); color: var(--fg); }
-nav a.active { background: var(--primary); color: white; }
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font); }
+body { background-color: var(--bg); color: var(--fg); line-height: 1.5; -webkit-font-smoothing: antialiased; padding-bottom: 100px; }
 
-.card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 20px;
-  margin-bottom: 16px;
-}
-.card h2 { font-size: 1.2em; margin-bottom: 16px; color: var(--primary); }
-.card h3 { font-size: 1em; margin-bottom: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.85em; }
+/* Glassmorphism Header */
+header { background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1000; padding: 12px 0; }
+[data-theme="light"] header { background: rgba(255, 255, 255, 0.85); }
+header .container { display: flex; justify-content: space-between; align-items: center; padding: 0 16px; max-width: 800px; margin: 0 auto; }
+.brand { font-size: 1.2em; font-weight: 800; letter-spacing: -0.5px; }
+nav { display: flex; align-items: center; gap: 8px; }
+#theme-toggle, #lang-toggle { background: var(--card); border: 1px solid var(--border); color: var(--fg); border-radius: 50px; height: 36px; padding: 0 12px; font-size: 0.85em; font-weight: 600; cursor: pointer; transition: 0.2s; }
+#theme-toggle { width: 36px; padding: 0; display: flex; align-items: center; justify-content: center; }
+#theme-toggle:hover, #lang-toggle:hover { border-color: var(--primary); }
+nav a#logout-btn { color: var(--danger); background: rgba(255, 69, 58, 0.1); padding: 8px 16px; border-radius: 50px; font-size: 0.85em; font-weight: 600; text-decoration: none; }
 
-.grid { display: grid; gap: 16px; }
-.grid.cols-2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
-.grid.cols-3 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
-.grid.cols-4 { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+/* Layout & Cards */
+.container { max-width: 600px; margin: 0 auto; padding: 16px; }
+.grid { display: flex; flex-direction: column; gap: 16px; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; }
+.card h2 { font-size: 1.1em; margin-bottom: 16px; font-weight: 700; letter-spacing: -0.5px; }
+.info-bar { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; font-size: 0.85em; color: var(--muted); margin-bottom: 16px; text-align: center; }
 
-.stat {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 16px;
+/* Inputs & Buttons */
+.form-group { margin-bottom: 12px; flex: 1; }
+.form-group label { display: block; margin-bottom: 6px; color: var(--muted); font-size: 0.75em; font-weight: 600; text-transform: uppercase; }
+.form-group input, .form-group select { 
+    width: 100%; padding: 14px; background: var(--input-bg); 
+    border: 1px solid rgba(204, 255, 0, 0.25); /* ചെറിയ പച്ച ബോർഡർ */
+    border-radius: 12px; color: var(--fg); font-size: 0.95em; transition: all 0.2s; 
 }
-.stat .label { color: var(--muted); font-size: 0.85em; margin-bottom: 4px; }
-.stat .value { font-size: 1.6em; font-weight: 700; }
-.stat .value.success { color: var(--success); }
-.stat .value.warning { color: var(--warning); }
-.stat .value.danger { color: var(--danger); }
+[data-theme="light"] .form-group input, [data-theme="light"] .form-group select {
+    border: 1.5px solid var(--border); /* ലൈറ്റ് തീമിൽ പഴയത് പോലെ */
+}
+.form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(204, 255, 0, 0.15); }
+.form-row { display: flex; gap: 12px; }
+.btn { display: flex; justify-content: center; align-items: center; padding: 16px; background: var(--primary); color: var(--primary-text); border: none; border-radius: 12px; cursor: pointer; font-size: 0.95em; font-weight: 700; width: 100%; transition: all 0.2s; margin-top: 8px; }
+.btn:hover { opacity: 0.9; } .btn:active { transform: scale(0.98); }
+.btn.secondary { background: transparent !important; border: 1.5px solid var(--border) !important; color: var(--fg) !important; }
+.btn.danger { background: transparent !important; border: 1px solid var(--danger) !important; color: var(--danger) !important; }
+.btn.small { padding: 6px 16px !important; font-size: 0.8em !important; border-radius: 8px !important; width: auto !important; margin: 0 !important; }
 
-.form-group { margin-bottom: 14px; }
-.form-group label {
-  display: block;
-  margin-bottom: 6px;
-  color: var(--muted);
-  font-size: 0.9em;
-}
-.form-group input, .form-group select, .form-group textarea {
-  width: 100%;
-  padding: 10px 12px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  color: var(--fg);
-  font-size: 1em;
-  font-family: inherit;
-}
-.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-  outline: none;
-  border-color: var(--primary);
-}
+/* Lists & Badges */
+.list-grid { display: flex; flex-direction: column; gap: 12px; }
+.list-item { background: var(--bg); border: 1px solid var(--border); border-radius: 16px; padding: 16px; position: relative; }
+.list-item-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.list-item-title { font-weight: 700; font-size: 1em; }
+.badge { padding: 4px 10px; border-radius: 8px; font-size: 0.7em; font-weight: 700; text-transform: uppercase; }
+.badge.payment_completed { background: rgba(52, 211, 153, 0.15); color: var(--success); }
+.badge.created, .badge.searching { background: rgba(255, 214, 10, 0.15); color: var(--warning); }
+.badge.cancelled, .badge.no_driver_available { background: rgba(255, 69, 58, 0.15); color: var(--danger); }
+.badge.assigned, .badge.trip_completed { background: rgba(204, 255, 0, 0.15); color: var(--primary); }
 
-.btn {
-  display: inline-block;
-  padding: 10px 20px;
+/* Timeline & Skeleton */
+.timeline { list-style: none; margin-top: 16px; padding-left: 8px; }
+.timeline li { padding: 8px 0 8px 24px; border-left: 2px solid var(--border); position: relative; font-size: 0.85em; color: var(--muted); }
+.timeline li::before { content: ''; position: absolute; left: -6px; top: 14px; width: 10px; height: 10px; border-radius: 50%; background: var(--primary); }
+.timeline li.completed { color: var(--fg); font-weight: 500; border-color: var(--primary); }
+.skeleton, .skeleton-card { background: linear-gradient(90deg, var(--border) 25%, #333 50%, var(--border) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite linear; border-radius: 8px; }
+.skeleton { height: 16px; } .skeleton-card { height: 80px; border-radius: 16px; margin-bottom: 12px; }
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+
+/* Screens */
+.screen { display: none; animation: fadeIn 0.3s ease; }
+.screen.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* =========================================
+   BOTTOM NAVIGATION (Uber Style Refined)
+   ========================================= */
+.bottom-nav {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  width: 92%; max-width: 500px; background: rgba(18, 18, 18, 0.85);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border); border-radius: 50px;
+  display: flex; justify-content: space-around; padding: 8px; z-index: 1000;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+[data-theme="light"] .bottom-nav { background: rgba(255, 255, 255, 0.85); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+
+.nav-item {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  text-decoration: none; color: var(--muted); padding: 8px 16px; border-radius: 30px;
+  transition: all 0.3s ease; cursor: pointer; font-size: 0.75em; font-weight: 600;
+}
+/* ആക്ടീവ് ആകുമ്പോൾ ചെറിയ പിൽ മാത്രം വരുന്നു */
+.nav-item.active {
   background: var(--primary);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.95em;
-  font-weight: 500;
-  transition: opacity 0.2s;
+  color: var(--primary-text);
 }
-.btn:hover { opacity: 0.9; }
-.btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.btn.secondary { background: var(--card); border: 1px solid var(--border); }
-.btn.success { background: var(--success); }
-.btn.danger { background: var(--danger); }
-.btn.warning { background: var(--warning); color: #000; }
-.btn.small { padding: 6px 12px; font-size: 0.85em; }
+.nav-icon { font-size: 1.4em; filter: grayscale(1) brightness(2); transition: 0.3s; }
+[data-theme="light"] .nav-icon { filter: grayscale(1) brightness(0.5); }
+.nav-item.active .nav-icon { filter: grayscale(0) brightness(0); }
 
-.badge {
-  display: inline-block;
-  padding: 3px 10px;
-  border-radius: 12px;
-  font-size: 0.8em;
-  font-weight: 600;
-}
-.badge.created, .badge.searching { background: var(--warning); color: #000; }
-.badge.assigned, .badge.driver_accepted, .badge.driver_on_way, .badge.driver_arrived { background: var(--primary); color: white; }
-.badge.vehicle_loaded, .badge.trip_in_progress { background: #8b5cf6; color: white; }
-.badge.trip_completed, .badge.payment_completed { background: var(--success); color: white; }
-.badge.cancelled, .badge.no_driver_available, .badge.payment_failed, .badge.disputed { background: var(--danger); color: white; }
-.badge.payment_pending { background: var(--warning); color: #000; }
-
-.timeline { list-style: none; margin-top: 12px; }
-.timeline li {
-  padding: 8px 0 8px 20px;
-  border-left: 2px solid var(--border);
-  position: relative;
-  font-size: 0.9em;
-}
-.timeline li::before {
-  content: '';
-  position: absolute;
-  left: -6px;
-  top: 12px;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--primary);
-}
-.timeline li.completed::before { background: var(--success); }
-
-.error {
-  background: rgba(239, 68, 68, 0.15);
-  border: 1px solid var(--danger);
-  border-radius: 6px;
-  padding: 12px;
-  margin-bottom: 16px;
-  color: #fca5a5;
-}
-.success-msg {
-  background: rgba(16, 185, 129, 0.15);
-  border: 1px solid var(--success);
-  border-radius: 6px;
-  padding: 12px;
-  margin-bottom: 16px;
-  color: #6ee7b7;
-}
-.info {
-  background: rgba(59, 130, 246, 0.1);
-  border: 1px solid var(--primary);
-  border-radius: 6px;
-  padding: 12px;
-  margin-bottom: 16px;
-  color: #93c5fd;
-  font-size: 0.9em;
+/* =========================================
+   CONSISTENT BORDERS FOR ALL PAGES
+   ========================================= */
+.card, .info-bar, .list-item {
+    border: 1px solid rgba(204, 255, 0, 0.2) !important; /* എല്ലാ കാർഡുകൾക്കും ലിസ്റ്റുകൾക്കും പച്ച ബോർഡർ */
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.9em;
-}
-th, td {
-  padding: 10px 8px;
-  text-align: left;
-  border-bottom: 1px solid var(--border);
-}
-th {
-  color: var(--muted);
-  font-weight: 500;
-  text-transform: uppercase;
-  font-size: 0.8em;
-  letter-spacing: 0.05em;
+/* Light Theme-ൽ പഴയ ബോർഡർ തന്നെ നിലനിർത്തുന്നു */
+[data-theme="light"] .card, 
+[data-theme="light"] .info-bar, 
+[data-theme="light"] .list-item {
+    border: 1px solid var(--border) !important;
 }
 
-.hidden { display: none !important; }
-.row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-.spacer { flex: 1; }
+/* =========================================
+   STRICT UI CONSISTENCY: SMALL BUTTONS (Track, Delete, etc.)
+   ========================================= */
+.btn.small {
+    padding: 6px 16px !important;
+    font-size: 0.8em !important;
+    border-radius: 8px !important;
+    width: auto !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: 1px solid rgba(204, 255, 0, 0.4) !important; /* പച്ച ബോർഡർ */
+    color: var(--fg) !important;
+    transition: all 0.2s ease !important;
+}
 
-pre {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  padding: 12px;
-  border-radius: 6px;
-  overflow-x: auto;
-  font-size: 0.85em;
-  font-family: 'Consolas', monospace;
+.btn.small:hover {
+    border-color: var(--primary) !important;
+    background: rgba(204, 255, 0, 0.05) !important;
+}
+
+/* Light Theme-ന് അനുയോജ്യമായ ബോർഡർ */
+[data-theme="light"] .btn.small {
+    border: 1px solid var(--border) !important;
+    background: var(--card) !important;
+}
+[data-theme="light"] .btn.small:hover {
+    border-color: var(--primary) !important;
+}
+
+/* =========================================
+   FIX: UNIVERSAL BORDER FOR SMALL BUTTONS (Track, Delete)
+   ========================================= */
+.btn.small, .btn.secondary, .list-item .btn {
+    padding: 6px 16px !important;
+    font-size: 0.8em !important;
+    border-radius: 8px !important;
+    width: auto !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: 1.5px solid var(--primary) !important; /* എല്ലാ തീമുകളിലും പച്ച ബോർഡർ */
+    color: var(--fg) !important;
+    transition: all 0.2s ease !important;
+    font-weight: 600 !important;
+}
+
+/* ബട്ടണിൽ മൗസ് അമർത്തുമ്പോൾ (Hover) */
+.btn.small:hover, .btn.secondary:hover, .list-item .btn:hover {
+    background: rgba(204, 255, 0, 0.1) !important;
+}
+[data-theme="light"] .btn.small:hover, 
+[data-theme="light"] .btn.secondary:hover, 
+[data-theme="light"] .list-item .btn:hover {
+    background: rgba(101, 163, 13, 0.1) !important;
+}
+
+/* =========================================
+   MOBILE RESPONSIVENESS & UI FINISHING
+   ========================================= */
+
+/* ഹെഡർ മൊബൈലിൽ ശരിയാക്കുന്നു (ടെക്സ്റ്റ് രണ്ട് വരിയാകുന്നത് തടയുന്നു) */
+header .container { flex-wrap: nowrap !important; gap: 10px; }
+.brand { white-space: nowrap; font-size: 1.1em; }
+nav { flex-wrap: nowrap; }
+
+/* മൊബൈൽ സ്ക്രീനുകൾക്കായി (480px-ൽ താഴെ) */
+@media (max-width: 480px) {
+    .container { padding: 12px; }
+    header { padding: 10px 0; }
+    .brand { font-size: 1em; }
+    #lang-toggle, #theme-toggle, nav a#logout-btn { 
+        padding: 6px 10px; font-size: 0.75em; height: 32px; 
+    }
+    #theme-toggle { width: 32px; }
+    
+    /* ഫോമുകൾ മൊബൈലിൽ ഒന്നിന് മുകളിൽ ഒന്നായി വരാൻ */
+    .form-row { flex-direction: column !important; gap: 8px !important; }
+    
+    /* ഡ്രൈവർ ആപ്പിലെ സമ്മറി ബോക്സുകൾ വശങ്ങളിലായിരിക്കാൻ */
+    body.driver-app .form-row { flex-direction: row !important; }
+    
+    .card { padding: 16px; }
+    .bottom-nav { width: 95% !important; bottom: 12px !important; padding: 6px !important; }
+    .nav-item { padding: 6px 12px !important; font-size: 0.7em !important; }
+    .nav-icon { font-size: 1.2em !important; }
+}
+
+/* ഡ്രൈവർ ആപ്പിലെ 'Today's Summary' ബോക്സുകൾ തുല്യമായി വിഭജിക്കാൻ */
+body.driver-app .card .form-row .list-item { 
+    width: 50%; 
+    flex: 1 1 0%; 
+}
+
+/* ലോഗിൻ പേജ് (index.html) ശരിയാക്കാൻ */
+.login-container {
+    max-width: 400px; margin: 40px auto; padding: 20px;
+}
+.login-container .card { padding: 24px; }
+.login-container .brand { text-align: center; margin-bottom: 20px; font-size: 1.5em; }
+
+/* =========================================
+   DESKTOP LAYOUT FOR DASHBOARD APPS (Agency & Admin)
+   ========================================= */
+@media (min-width: 768px) {
+  /* ഡെസ്ക്ടോപ്പിൽ ബോട്ടം നാവിഗേഷൻ എടുത്തുമാറ്റി സൈഡ്ബാർ ആക്കുന്നു */
+  body.dashboard-app { 
+    display: flex; 
+    flex-direction: row; 
+    padding-bottom: 0; 
+  }
+  
+  body.dashboard-app .bottom-nav {
+    position: fixed; top: 0; left: 0; bottom: 0;
+    width: 260px; height: 100vh;
+    flex-direction: column; justify-content: flex-start;
+    background: var(--card); border-right: 1px solid var(--border);
+    border-radius: 0; border-top: none; border-left: none; border-bottom: none;
+    padding: 24px 16px; transform: none; box-shadow: none;
+  }
+  
+  /* സൈഡ്ബാറിന്റെ മുകളിൽ ആപ്പിന്റെ പേര് കാണിക്കാൻ */
+  body.dashboard-app .bottom-nav::before {
+    content: "VRA Portal"; font-weight: 800; font-size: 1.4em;
+    color: var(--primary); margin-bottom: 30px; padding-left: 12px;
+    font-family: var(--font);
+  }
+  
+  body.dashboard-app .nav-item {
+    flex-direction: row; justify-content: flex-start; width: 100%;
+    padding: 14px 20px; border-radius: 12px; gap: 16px; margin-bottom: 8px;
+  }
+  
+  body.dashboard-app .nav-item.active {
+    background: rgba(255, 255, 255, 0.05) !important;
+    box-shadow: inset 4px 0 0 var(--primary); /* ഇടതുവശത്ത് നേർത്ത ലൈൻ */
+    color: var(--primary) !important;
+  }
+  
+  body.dashboard-app header {
+    width: calc(100% - 260px); margin-left: 260px;
+  }
+  
+  body.dashboard-app main.container {
+    margin-left: 260px; max-width: 1000px; width: calc(100% - 260px);
+    padding-top: 90px; /* ഹെഡറിന് താഴെ വരാൻ */
+  }
+}
+
+/* =========================================
+   FIXED DESKTOP LAYOUT (Agency & Admin)
+   ========================================= */
+@media (min-width: 768px) {
+  /* ബോഡിക്ക് ഇടതുവശത്ത് സ്പേസ് നൽകുന്നു (സൈഡ്ബാറിനായി) */
+  body.dashboard-app {
+    padding-left: 260px !important;
+    padding-bottom: 0 !important;
+  }
+
+  /* സൈഡ്ബാർ ഫിക്സ് ചെയ്യുന്നു */
+  body.dashboard-app .bottom-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 260px;
+    height: 100vh;
+    flex-direction: column;
+    justify-content: flex-start;
+    background: var(--card);
+    border-right: 1px solid var(--border);
+    border-radius: 0;
+    border-top: none; border-left: none; border-bottom: none;
+    padding: 24px 16px;
+    transform: none;
+    box-shadow: none;
+    z-index: 1000;
+  }
+
+  /* സൈഡ്ബാറിന് മുകളിൽ ലോഗോ/പേര് */
+  body.dashboard-app .bottom-nav::before {
+    content: "VRA Portal";
+    font-weight: 800;
+    font-size: 1.4em;
+    color: var(--primary);
+    margin-bottom: 30px;
+    padding-left: 12px;
+    font-family: var(--font);
+  }
+
+  /* സൈഡ്ബാർ ലിങ്കുകൾ */
+  body.dashboard-app .nav-item {
+    flex-direction: row;
+    justify-content: flex-start;
+    width: 100%;
+    padding: 14px 20px;
+    border-radius: 12px;
+    gap: 16px;
+    margin-bottom: 8px;
+    background: transparent !important;
+  }
+
+  /* ആക്ടീവ് ആകുന്ന ലിങ്കിന് ഇടതുവശത്ത് നേർത്ത ലൈൻ */
+  body.dashboard-app .nav-item.active {
+    background: rgba(128, 128, 128, 0.1) !important;
+    box-shadow: inset 4px 0 0 var(--primary);
+    color: var(--primary) !important;
+  }
+  body.dashboard-app .nav-item.active .nav-icon {
+    filter: none !important;
+  }
+
+  /* ഹെഡർ ശരിയാക്കുന്നു */
+  body.dashboard-app header {
+    margin: 0;
+    width: 100%;
+  }
+  body.dashboard-app header .container {
+    max-width: 100%;
+    padding: 0 24px;
+    margin: 0;
+  }
+
+  /* മെയിൻ കണ്ടന്റ് സെന്ററിൽ ആക്കുന്നു */
+  body.dashboard-app main.container {
+    max-width: 900px;
+    margin: 0 auto !important;
+    padding: 24px !important;
+  }
+}
+
+/* =========================================
+   FIX 1: LIGHT THEME TEXT COLORS (READABILITY)
+   ========================================= */
+[data-theme="light"] {
+    --success: #059669; /* കൂടുതൽ ഡാർക്ക് ഗ്രീൻ */
+    --danger: #DC2626;  /* കൂടുതൽ ഡാർക്ക് ചുവപ്പ് */
+    --warning: #D97706; /* കൂടുതൽ ഡാർക്ക് ഓറഞ്ച്/മഞ്ഞ */
+}
+[data-theme="light"] .badge.created, 
+[data-theme="light"] .badge.searching {
+    background: rgba(217, 119, 6, 0.15);
+    color: var(--warning);
+}
+[data-theme="light"] .badge.payment_completed {
+    background: rgba(5, 150, 105, 0.15);
+    color: var(--success);
+}
+
+/* =========================================
+   FIX 2: TABLET LAYOUT (Prevent squishing)
+   ========================================= */
+/* .form-row-ലെ ബോക്സുകൾ ചെറുതാകുമ്പോൾ താഴേക്ക് പോകാൻ */
+.form-row { flex-wrap: wrap; }
+
+/* സൈഡ്ബാർ 1024px-ന് മുകളിൽ മാത്രം വരാൻ (Tablets-ൽ താഴെ ബട്ടൺ തന്നെ വരും) */
+@media (min-width: 768px) and (max-width: 1023px) {
+    body.dashboard-app { padding-left: 0 !important; }
+    body.dashboard-app .bottom-nav {
+        position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+        width: 92%; max-width: 500px; height: auto; flex-direction: row;
+        border: 1px solid var(--border); border-radius: 50px;
+        background: rgba(18, 18, 18, 0.85); backdrop-filter: blur(20px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5); padding: 8px;
+    }
+    [data-theme="light"] body.dashboard-app .bottom-nav { background: rgba(255, 255, 255, 0.85); }
+    body.dashboard-app .bottom-nav::before { display: none; }
+    body.dashboard-app .nav-item { flex-direction: column; padding: 8px 16px; }
+    body.dashboard-app header, body.dashboard-app main.container { width: 100%; margin: 0 auto; }
+}
+
+/* =========================================
+   FIX 3: RTL (ARABIC) SUPPORT
+   ========================================= */
+[dir="rtl"] body {
+    text-align: right;
+}
+[dir="rtl"] .nav-item {
+    flex-direction: row-reverse;
+}
+[dir="rtl"] .list-item-header, 
+[dir="rtl"] .info-bar {
+    text-align: right;
+}
+
+/* RTL Desktop Sidebar */
+@media (min-width: 1024px) {
+    [dir="rtl"] body.dashboard-app { padding-left: 0 !important; padding-right: 260px !important; }
+    [dir="rtl"] body.dashboard-app .bottom-nav {
+        left: auto; right: 0;
+        border-right: none; border-left: 1px solid var(--border);
+    }
+    [dir="rtl"] body.dashboard-app .nav-item.active {
+        box-shadow: inset -4px 0 0 var(--primary); /* ലൈൻ വലതുവശത്തേക്ക് */
+    }
+    [dir="rtl"] body.dashboard-app .bottom-nav::before {
+        padding-left: 0; padding-right: 12px; text-align: right;
+    }
+}
+
+/* =========================================
+   FINAL UI FIXES: TABLET, RTL HEADER, STATS
+   ========================================= */
+
+/* 1. ഫോം റോകളിലെ ബോക്സുകൾ ശരിയായി റെസ്പോൺസീവ് ആക്കുന്നു */
+.form-row { display: flex !important; flex-direction: row !important; gap: 12px !important; flex-wrap: wrap !important; }
+.card .form-row .list-item { flex: 1 1 45% !important; min-width: 45% !important; } 
+@media (max-width: 360px) { .card .form-row .list-item { flex: 1 1 100% !important; } }
+
+/* 2. Tablet Layout (768px - 1023px) - ഇവിടെ സൈഡ്ബാർ വരില്ല, താഴെ ബട്ടൺ തന്നെ വരും */
+@media (min-width: 768px) and (max-width: 1023px) {
+  body.dashboard-app { padding-left: 0 !important; padding-right: 0 !important; }
+  
+  /* ബോട്ടം നാവിഗേഷൻ മൊബൈൽ പോലെ ആക്കുന്നു */
+  body.dashboard-app .bottom-nav {
+    position: fixed !important; top: auto !important; bottom: 20px !important; 
+    left: 50% !important; right: auto !important; transform: translateX(-50%) !important;
+    width: 90% !important; max-width: 500px !important; height: auto !important; 
+    flex-direction: row !important; border-radius: 50px !important; 
+    border: 1px solid var(--border) !important; background: rgba(18, 18, 18, 0.85) !important; 
+    backdrop-filter: blur(20px) !important; box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important; 
+    padding: 8px !important;
+  }
+  [data-theme="light"] body.dashboard-app .bottom-nav { background: rgba(255, 255, 255, 0.85) !important; }
+  
+  body.dashboard-app .bottom-nav::before { display: none !important; }
+  body.dashboard-app .nav-item { flex-direction: column !important; padding: 8px 16px !important; margin: 0 !important; }
+  body.dashboard-app .nav-item.active { box-shadow: none !important; background: var(--primary) !important; color: var(--primary-text) !important; }
+  
+  body.dashboard-app header { width: 100% !important; margin-left: 0 !important; margin-right: 0 !important; }
+  body.dashboard-app main.container { margin-left: auto !important; margin-right: auto !important; width: 100% !important; padding-top: 20px !important; }
+}
+
+/* 3. Desktop RTL (Arabic) Header & Sidebar ഫിക്സ് */
+@media (min-width: 1024px) {
+  [dir="rtl"] body.dashboard-app { padding-left: 0 !important; padding-right: 260px !important; }
+  [dir="rtl"] body.dashboard-app .bottom-nav { 
+    left: auto !important; right: 0 !important; 
+    border-left: 1px solid var(--border) !important; border-right: none !important; 
+  }
+  [dir="rtl"] body.dashboard-app .nav-item.active { box-shadow: inset -4px 0 0 var(--primary) !important; }
+  [dir="rtl"] body.dashboard-app .bottom-nav::before { text-align: right !important; padding-left: 0 !important; padding-right: 12px !important; }
+  
+  /* RTL-ൽ ഹെഡർ ബ്രാൻഡ് മറഞ്ഞുപോകുന്നത് തടയുന്നു */
+  [dir="rtl"] body.dashboard-app header, 
+  [dir="rtl"] body.dashboard-app main.container { 
+    margin-left: 0 !important; margin-right: 260px !important; 
+    width: calc(100% - 260px) !important; 
+  }
+}
+
+/* 4. RTL ജനറൽ ഫിക്സുകൾ */
+[dir="rtl"] .brand { text-align: right; }
+[dir="rtl"] header .container { flex-direction: row-reverse; }
+[dir="rtl"] .form-group label { text-align: right; }
+[dir="rtl"] .list-item-header { flex-direction: row-reverse; }
+
+/* 5. Light Theme ബാഡ്ജ് കളറുകൾ */
+[data-theme="light"] .badge.assigned { background: rgba(168, 85, 247, 0.15); color: #7E22CE; }
+[data-theme="light"] .badge.created { background: rgba(217, 119, 6, 0.15); color: #D97706; }
+[data-theme="light"] .badge.payment_completed { background: rgba(5, 150, 105, 0.15); color: #059669; }
+
+/* =========================================
+   BULLETPROOF TABLET LAYOUT (768px - 1023px)
+   ========================================= */
+@media (min-width: 768px) and (max-width: 1023px) {
+  /* ബോഡി ലേ ഔട്ട് റീസെറ്റ് ചെയ്യുന്നു */
+  body.dashboard-app, body.agency-app, body.admin-app {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    display: block !important;
+    min-height: 100vh !important;
+  }
+
+  /* ഹെഡർ ഫുൾ വിഡ്ത്ത് ആക്കുന്നു (RTL & LTR) */
+  body.dashboard-app header,
+  body.agency-app header,
+  body.admin-app header,
+  [dir="rtl"] body.dashboard-app header,
+  [dir="rtl"] body.agency-app header,
+  [dir="rtl"] body.admin-app header {
+    width: 100% !important;
+    margin: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    position: sticky !important;
+    top: 0 !important;
+  }
+  
+  header .container {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 0 24px !important;
+    margin: 0 auto !important;
+  }
+
+  /* മെയിൻ കണ്ടന്റ് ഫുൾ വിഡ്ത്ത് ആക്കുന്നു (RTL & LTR) */
+  body.dashboard-app main.container,
+  body.agency-app main.container,
+  body.admin-app main.container,
+  [dir="rtl"] body.dashboard-app main.container,
+  [dir="rtl"] body.agency-app main.container,
+  [dir="rtl"] body.admin-app main.container {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+    padding: 24px !important;
+    padding-top: 20px !important;
+  }
+
+  /* ബോട്ടം നാവിഗേഷൻ കൃത്യമായി താഴെ മാത്രം വരാൻ (RTL & LTR) */
+  body.dashboard-app .bottom-nav,
+  body.agency-app .bottom-nav,
+  body.admin-app .bottom-nav,
+  [dir="rtl"] body.dashboard-app .bottom-nav,
+  [dir="rtl"] body.agency-app .bottom-nav,
+  [dir="rtl"] body.admin-app .bottom-nav {
+    position: fixed !important;
+    top: auto !important;
+    bottom: 20px !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    width: 90% !important;
+    max-width: 500px !important;
+    height: auto !important;
+    flex-direction: row !important;
+    border-radius: 50px !important;
+    border: 1px solid var(--border) !important;
+    background: rgba(18, 18, 18, 0.85) !important;
+    backdrop-filter: blur(20px) !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+    padding: 8px !important;
+  }
+  
+  [data-theme="light"] body.dashboard-app .bottom-nav,
+  [data-theme="light"] body.agency-app .bottom-nav,
+  [data-theme="light"] body.admin-app .bottom-nav {
+    background: rgba(255, 255, 255, 0.85) !important;
+  }
+
+  /* നാവിഗേഷൻ ഐറ്റങ്ങൾ ശരിയാക്കാൻ */
+  body.dashboard-app .bottom-nav::before,
+  body.agency-app .bottom-nav::before,
+  body.admin-app .bottom-nav::before {
+    display: none !important;
+  }
+
+  body.dashboard-app .nav-item,
+  body.agency-app .nav-item,
+  body.admin-app .nav-item {
+    flex-direction: column !important;
+    padding: 8px 16px !important;
+    margin: 0 !important;
+    flex: 1 !important;
+  }
+  
+  body.dashboard-app .nav-item.active,
+  body.agency-app .nav-item.active,
+  body.admin-app .nav-item.active {
+    box-shadow: none !important;
+    background: var(--primary) !important;
+    color: var(--primary-text) !important;
+  }
+
+  /* RTL-ൽ ഹെഡർ ബ്രാൻഡ് കൃത്യമായി വലതുവശത്ത് വരാൻ */
+  [dir="rtl"] header .container {
+    flex-direction: row-reverse !important;
+  }
+}
+
+/* അറബിക് ലാംഗ്വേജിൽ ബ്രാൻഡ് നെയിം മറയാതിരിക്കാൻ */
+[dir="rtl"] .brand {
+  margin-left: auto !important;
+  margin-right: 0 !important;
+}
+
+/* =========================================
+   LEAFLET MAP STYLES
+   ========================================= */
+.map-container {
+    height: 200px;
+    width: 100%;
+    border-radius: 16px;
+    margin-top: 12px;
+    border: 1px solid var(--border);
+    z-index: 1;
+}
+.leaflet-container {
+    background: var(--card) !important;
+    font-family: var(--font) !important;
+}
+.leaflet-popup-content-wrapper, .leaflet-popup-tip {
+    background: var(--card) !important;
+    color: var(--fg) !important;
+    border: 1px solid var(--border) !important;
+}
+
+/* =========================================
+   LEAFLET MAP STYLES
+   ========================================= */
+.map-container {
+    height: 200px;
+    width: 100%;
+    border-radius: 16px;
+    margin-top: 16px;
+    border: 1px solid var(--border);
+    z-index: 1;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+}
+.leaflet-container {
+    background: var(--card) !important;
+    font-family: var(--font) !important;
+}
+.leaflet-popup-content-wrapper, .leaflet-popup-tip {
+    background: var(--card) !important;
+    color: var(--fg) !important;
+    border: 1px solid var(--border) !important;
+}
+
+/* Ensure Customer App uses Lime Green Theme */
+body.customer-app {
+  --primary: #CCFF00;
+  --primary-text: #000000;
+}
+body.customer-app[data-theme="light"] {
+  --primary: #65A30D;
+  --primary-text: #FFFFFF;
+}
+body.customer-app .card, body.customer-app .info-bar, body.customer-app .list-item {
+  border-color: rgba(204, 255, 0, 0.25) !important;
+}
+body.customer-app .btn.small, body.customer-app .btn.secondary, body.customer-app .list-item .btn {
+  border-color: var(--primary) !important;
+  color: var(--fg) !important;
+}
+body.customer-app .nav-item.active {
+  background: var(--primary) !important;
+  color: var(--primary-text) !important;
+}
+
+/* Uber-style Clean Map (Hide Routing Instructions) */
+.leaflet-routing-container {
+    display: none !important;
 }

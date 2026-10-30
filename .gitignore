@@ -14,3 +14,17 @@ diag-*.js
 .idea/
 Thumbs.db
 .DS_Store
+# --- AI chaos cleanup: backup files should never be committed ---
+*.backup
+*.backup2
+*.backup3
+*.safe_backup
+*.ui_backup
+*.bak2
+*.bak
+*.zip
+backups/
+data/*.db-journal
+data/*.db-wal
+data/*.db-shm
+.env

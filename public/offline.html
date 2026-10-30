@@ -1,0 +1,46 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Offline — Vehicle Recovery</title>
+<style>
+  :root { --lime: #84cc16; --dark: #0a0a0a; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--dark); color: #fff;
+    font-family: system-ui, -apple-system, sans-serif;
+    text-align: center; padding: 20px;
+  }
+  .box { max-width: 380px; }
+  h1 { color: var(--lime); font-size: 72px; margin: 0; line-height: 1; }
+  h2 { font-size: 22px; margin: 12px 0; }
+  p { color: #999; line-height: 1.5; margin: 0 0 24px; }
+  button {
+    padding: 14px 32px; background: var(--lime); color: var(--dark);
+    border: 0; border-radius: 999px; font-weight: 700; font-size: 15px;
+    cursor: pointer; transition: transform 0.15s;
+  }
+  button:hover { transform: scale(1.04); }
+</style>
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#84cc16" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Recovery" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+</head>
+<body>
+  <div class="box">
+    <h1>📡</h1>
+    <h2>You're offline</h2>
+    <p>No internet connection. Check your network and try again.</p>
+    <button onclick="location.reload()">Retry</button>
+  </div>
+</body>
+</html>
+

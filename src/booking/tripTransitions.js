@@ -1,4 +1,4 @@
-const { recordStatus } = require('./statusHistory');
+﻿const { recordStatus } = require('./statusHistory');
 
 const ALLOWED_TRANSITIONS = {
   'assigned':        ['driver_on_way', 'cancelled'],
@@ -8,6 +8,7 @@ const ALLOWED_TRANSITIONS = {
   'trip_in_progress':['trip_completed'],
   'trip_completed':  ['payment_pending', 'disputed'],
   'payment_pending': ['payment_completed', 'payment_failed', 'disputed'],
+  'no_driver_available': ['cancelled'],
   'payment_completed': ['disputed'],
   'payment_failed': ['payment_pending', 'disputed'],
   'disputed': ['payment_pending', 'payment_completed', 'cancelled']
@@ -84,7 +85,7 @@ function computeCancellationOutcome(db, booking, actorRole, now = new Date()) {
   }
 
   // Customer
-  if (['created', 'searching'].includes(booking.status)) {
+  if (['created', 'searching', 'no_driver_available'].includes(booking.status)) {
     return { allowed: true, fee_minor: 0, reason: 'before_driver_assigned' };
   }
   if (['assigned', 'driver_on_way', 'driver_arrived'].includes(booking.status)) {
@@ -104,3 +105,4 @@ module.exports = {
   haversineM,
   computeCancellationOutcome
 };
+

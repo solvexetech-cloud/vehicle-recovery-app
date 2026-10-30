@@ -1,105 +1,113 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vehicle Recovery App</title>
-<link rel="stylesheet" href="/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Login - Vehicle Recovery</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#84cc16" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Recovery" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
 </head>
 <body>
-<header>
-  <div class="container">
-    <div class="brand">Vehicle Recovery <span>· GCC</span></div>
-  </div>
-</header>
-<main class="container">
-  <div class="grid cols-2">
-    <div>
-      <div class="card">
-        <h2>🚨 On-Demand Vehicle Recovery</h2>
-        <p style="color:var(--muted);margin-bottom:16px;">
-          Immediate booking only. Towing, breakdown, accident recovery — nearby drivers dispatched in seconds.
-        </p>
-        <div class="stat"><div class="label">Server Status</div><div class="value" id="health-status">checking...</div></div>
-      </div>
-      <div class="card">
-        <h3>How it works</h3>
-        <ol style="padding-left:20px;color:var(--muted);line-height:1.8;">
-          <li>Register with your email (verification token shown in dev)</li>
-          <li>Save your vehicle & emergency destination</li>
-          <li>Tap "Recovery" → fare estimate → confirm</li>
-          <li>Nearest eligible driver dispatched automatically</li>
-          <li>Track live, pay cash or online (test mode)</li>
-        </ol>
-      </div>
+
+  <header>
+    <div class="container">
+      <div class="brand" data-i18n="app.title">Vehicle Recovery</div>
+      <nav>
+        <button id="lang-toggle">العربية</button>
+        <button id="theme-toggle">🌙</button>
+      </nav>
     </div>
+  </header>
 
-    <div>
-      <!-- LOGIN -->
-      <div class="card" id="login-card">
-        <h2>Login</h2>
-        <div id="login-error" class="error hidden"></div>
-        <form id="login-form">
-          <div class="form-group">
-            <label>Email or phone</label>
-            <input type="text" id="login-identifier" required placeholder="you@example.com">
-          </div>
-          <div class="form-group">
-            <label>Password</label>
-            <input type="password" id="login-password" required>
-          </div>
-          <button type="submit" class="btn">Login</button>
-        </form>
-        <p style="margin-top:16px;color:var(--muted);font-size:0.9em;">
-          New here? <a href="#" id="show-register" style="color:var(--primary);">Create account</a>
-        </p>
-      </div>
-
-      <!-- REGISTER -->
-      <div class="card hidden" id="register-card">
-        <h2>Register</h2>
-        <div id="register-error" class="error hidden"></div>
-        <form id="register-form">
-          <div class="form-group">
-            <label>Account type</label>
-            <select id="reg-role">
-              <option value="customer">Customer (need recovery)</option>
-              <option value="driver">Driver (offer recovery)</option>
-              <option value="agency">Agency (fleet owner)</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Full name</label>
-            <input type="text" id="reg-full-name" required minlength="2">
-          </div>
-          <div class="form-group">
-            <label>Email</label>
-            <input type="email" id="reg-email" required>
-          </div>
-          <div class="form-group">
-            <label>Password (8+ chars, letter + digit)</label>
-            <input type="password" id="reg-password" required minlength="8">
-          </div>
-          <div class="form-group">
-            <label>Country</label>
-            <select id="reg-country"></select>
-          </div>
-          <button type="submit" class="btn">Register</button>
-        </form>
-        <div id="verify-info" class="hidden" style="margin-top:16px;">
-          <div class="success-msg">Registration successful! Verify your email:</div>
-          <div id="verify-link"></div>
-          <p style="margin-top:12px;color:var(--muted);font-size:0.85em;">
-            (In production, this link is emailed. In dev, it is shown here for convenience.)
-          </p>
+  <main class="login-container">
+    <div class="card">
+      <h2 class="brand" style="text-align: center; margin-bottom: 20px;">Login</h2>
+      <form id="login-form">
+        <div class="form-group">
+          <label>Email or Phone</label>
+          <input type="text" id="login-email" placeholder="demo1@example.com" required>
         </div>
-        <p style="margin-top:16px;color:var(--muted);font-size:0.9em;">
-          Have an account? <a href="#" id="show-login" style="color:var(--primary);">Login</a>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="login-password" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn" style="margin-top: 16px;" id="login-btn">Login</button>
+        <p style="text-align: center; margin-top: 16px; font-size: 0.85em; color: var(--muted);">
+          New here? <a href="#" style="color: var(--primary); text-decoration: none; font-weight: 600;">Create account</a>
         </p>
-      </div>
+      </form>
     </div>
-  </div>
-</main>
-<script src="/app.js"></script>
+  </main>
+
+  <script src="theme.js"></script>
+  <script src="i18n.js"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const loginForm = document.getElementById('login-form');
+      const loginBtn = document.getElementById('login-btn');
+
+      loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+
+        loginBtn.textContent = 'Logging in...';
+        loginBtn.disabled = true;
+
+        try {
+          // പേലോഡിൽ 'identifier' എന്ന് മാറ്റി. കൂടാതെ credentials: 'include' ചേർത്തു (cookie-കൾക്കായി)
+          const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ identifier: email, password: password }),
+            credentials: 'include' 
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            // റോൾ കണ്ടെത്തുന്നു (ബാക്ക്എൻഡ് എങ്ങനെ റിട്ടേൺ ചെയ്യുന്നു എന്നത് അനുസരിച്ച്)
+            let role = 'customer';
+            if (data.user && data.user.role) role = data.user.role;
+            else if (data.role) role = data.role;
+
+            // ലോക്കൽ സ്റ്റോറേജിൽ സേവ് ചെയ്യുന്നു
+            if(data.token) localStorage.setItem('token', data.token);
+            localStorage.setItem('userRole', role);
+
+            // റോൾ അനുസരിച്ച് റീഡയറക്ട് ചെയ്യുന്നു
+            if (role === 'driver') {
+              window.location.href = '/driver.html';
+            } else if (role === 'agency') {
+              window.location.href = '/agency.html';
+            } else if (role === 'admin' || role === 'superadmin' || role === 'super_admin') {
+              window.location.href = '/admin.html';
+            } else {
+              window.location.href = '/customer.html';
+            }
+          } else {
+            alert(data.message || 'Login failed. Please check your credentials.');
+            loginBtn.textContent = 'Login';
+            loginBtn.disabled = false;
+          }
+        } catch (error) {
+          console.error('Login Error:', error);
+          alert('Server error. Please try again later.');
+          loginBtn.textContent = 'Login';
+          loginBtn.disabled = false;
+        }
+      });
+    });
+  </script>
 </body>
 </html>
+

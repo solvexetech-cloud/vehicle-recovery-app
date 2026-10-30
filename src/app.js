@@ -28,6 +28,15 @@ const adminSupportRoutes = require('./routes/adminSupport');
 function createApp(opts = {}) {
   const log = opts.logger || logger;
   const app = express();
+  app.use(express.json());
+  const walletRoute = require('./routes/wallet');
+  app.use('/api/wallet', walletRoute);
+  app.use('/api/customer/manage', require('./routes/customer_management'));
+
+  app.use('/api/admin/manage', require('./routes/admin_management'));
+  app.use('/api/customer/manage', require('./routes/customer_management'));
+
+
   app.use(express.json({ limit: '4mb' }));
   app.use(express.static(require('node:path').join(__dirname, '..', 'public')));
 
@@ -93,21 +102,117 @@ function createApp(opts = {}) {
   });
 
   app.use('/api/auth', authRoutes.routes(db, config));
+  app.use('/api/customer/manage', require('./routes/customer_management'));
+
+  app.use('/api/admin/manage', require('./routes/admin_management'));
+  app.use('/api/customer/manage', require('./routes/customer_management'));
+
+
   app.use('/api/countries', countriesRoutes.routes(db));
+  app.use('/api/customer/manage', require('./routes/customer_management'));
+
+  app.use('/api/admin/manage', require('./routes/admin_management'));
+  app.use('/api/customer/manage', require('./routes/customer_management'));
+
+
   app.use('/api/admin/reports', reportsRoutes.routes(db));
+  app.use('/api/customer/manage', require('./routes/customer_management'));
+
+  app.use('/api/admin/manage', require('./routes/admin_management'));
+  app.use('/api/customer/manage', require('./routes/customer_management'));
+
+
   app.use('/api/admin', adminSupportRoutes.routes(db));
+  app.use('/api/customer/manage', require('./routes/customer_management'));
+
+  app.use('/api/admin/manage', require('./routes/admin_management'));
+  app.use('/api/customer/manage', require('./routes/customer_management'));
+
+
   app.use('/api/admin', adminRoutes.routes(db));
+  app.use('/api/customer/manage', require('./routes/customer_management'));
+
+  app.use('/api/admin/manage', require('./routes/admin_management'));
+  app.use('/api/customer/manage', require('./routes/customer_management'));
+
+
   app.use('/api/super', superRoutes.routes(db, config));
+  app.use('/api/customer/manage', require('./routes/customer_management'));
+
+  app.use('/api/admin/manage', require('./routes/admin_management'));
+  app.use('/api/customer/manage', require('./routes/customer_management'));
+
+
   app.use('/api/customer/bookings', customerPaymentsRoutes.routes(db));
+  app.use('/api/customer/manage', require('./routes/customer_management'));
+
+  app.use('/api/admin/manage', require('./routes/admin_management'));
+  app.use('/api/customer/manage', require('./routes/customer_management'));
+
+
   app.use('/api/customer', customerSupportRoutes.routes(db));
+  app.use('/api/customer/manage', require('./routes/customer_management'));
+
+  app.use('/api/admin/manage', require('./routes/admin_management'));
+  app.use('/api/customer/manage', require('./routes/customer_management'));
+
+
   app.use('/api/customer/bookings', dispatchRoutes.routes(db));
+  app.use('/api/customer/manage', require('./routes/customer_management'));
+
+  app.use('/api/admin/manage', require('./routes/admin_management'));
+  app.use('/api/customer/manage', require('./routes/customer_management'));
+
+
   app.use('/api/customer/bookings', bookingsRoutes.routes(db));
+  app.use('/api/customer/manage', require('./routes/customer_management'));
+
+  app.use('/api/admin/manage', require('./routes/admin_management'));
+  app.use('/api/customer/manage', require('./routes/customer_management'));
+
+
   app.use('/api/customer', customerRoutes.routes(db));
+  app.use('/api/customer/manage', require('./routes/customer_management'));
+
+  app.use('/api/admin/manage', require('./routes/admin_management'));
+  app.use('/api/customer/manage', require('./routes/customer_management'));
+
+
   app.use('/api/driver/bookings', driverPaymentsRoutes.routes(db));
+  app.use('/api/customer/manage', require('./routes/customer_management'));
+
+  app.use('/api/admin/manage', require('./routes/admin_management'));
+  app.use('/api/customer/manage', require('./routes/customer_management'));
+
+
   app.use('/api/driver', driverSupportRoutes.routes(db));
+  app.use('/api/customer/manage', require('./routes/customer_management'));
+
+  app.use('/api/admin/manage', require('./routes/admin_management'));
+  app.use('/api/customer/manage', require('./routes/customer_management'));
+
+
   app.use('/api/driver/bookings', driverBookingsRoutes.routes(db));
+  app.use('/api/customer/manage', require('./routes/customer_management'));
+
+  app.use('/api/admin/manage', require('./routes/admin_management'));
+  app.use('/api/customer/manage', require('./routes/customer_management'));
+
+
   app.use('/api/driver', driverRoutes.routes(db));
+  app.use('/api/customer/manage', require('./routes/customer_management'));
+
+  app.use('/api/admin/manage', require('./routes/admin_management'));
+  app.use('/api/customer/manage', require('./routes/customer_management'));
+
+
   app.use('/api/agency', agencyRoutes.routes(db));
+  app.use('/api/customer/manage', require('./routes/customer_management'));
+
+  app.use('/api/admin/manage', require('./routes/admin_management'));
+  app.use('/api/customer/manage', require('./routes/customer_management'));
+
+
 
   app.use(notFoundHandler);
   app.use(errorHandler);
@@ -116,3 +221,7 @@ function createApp(opts = {}) {
 }
 
 module.exports = { createApp };
+
+
+
+

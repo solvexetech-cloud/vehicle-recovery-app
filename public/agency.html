@@ -1,0 +1,171 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Agency - Vehicle Recovery</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body.agency-app {
+      --primary: #A855F7; /* പർപ്പിൾ */
+      --primary-text: #FFFFFF;
+    }
+    body.agency-app[data-theme="light"] { --primary: #7E22CE; --primary-text: #FFFFFF; }
+    body.agency-app .form-group input:focus, body.agency-app .form-group select:focus { border-color: var(--primary) !important; box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.2) !important; }
+    body.agency-app .card, body.agency-app .info-bar, body.agency-app .list-item { border-color: rgba(168, 85, 247, 0.25) !important; }
+    body.agency-app .btn.small, body.agency-app .btn.secondary, body.agency-app .list-item .btn { border-color: var(--primary) !important; color: var(--fg) !important; }
+    body.agency-app .timeline li::before { background: var(--primary); }
+    body.agency-app .nav-item.active { background: var(--primary) !important; color: var(--primary-text) !important; }
+  </style>
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#84cc16" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Recovery" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+</head>
+<body class="agency-app dashboard-app">
+
+  <header>
+    <div class="container">
+      <div class="brand" data-i18n="app.title">Agency Portal</div>
+      <nav>
+        <button id="lang-toggle">العربية</button>
+        <button id="theme-toggle">🌙</button>
+        <a href="#" id="logout-btn" data-i18n="nav.logout">Logout</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div id="country-info" class="info-bar">Al-Sadd Towing Services · 12 Drivers · 15 Vehicles</div>
+
+    <section id="screen-dashboard" class="screen active">
+      <div class="grid">
+        <div class="card">
+          <h2 data-i18n="agency.overview">📊 Today's Overview</h2>
+          <div class="form-row">
+            <div class="list-item" style="text-align: center; flex: 1; padding: 16px;">
+              <div style="font-size: 0.75em; color: var(--muted); text-transform: uppercase; font-weight: 600; margin-bottom: 4px;" data-i18n="agency.revenue">Revenue</div>
+              <div style="font-size: 1.5em; font-weight: 800; color: var(--primary);">1,450 QAR</div>
+            </div>
+            <div class="list-item" style="text-align: center; flex: 1; padding: 16px;">
+              <div style="font-size: 0.75em; color: var(--muted); text-transform: uppercase; font-weight: 600; margin-bottom: 4px;" data-i18n="agency.active_trips">Active Trips</div>
+              <div style="font-size: 1.5em; font-weight: 800;">5</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 data-i18n="agency.quick_actions">⚡ Quick Actions</h2>
+          <div class="form-row">
+            <button class="btn secondary" style="margin-top: 0;" data-i18n="agency.add_driver">+ Add Driver</button>
+            <button class="btn secondary" style="margin-top: 0;" data-i18n="agency.add_vehicle">+ Add Vehicle</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 data-i18n="agency.live_bookings">🚨 Live Bookings</h2>
+          <div class="list-grid">
+            <div class="list-item">
+              <div class="list-item-header">
+                <span class="list-item-title">Towing - Toyota LC</span>
+                <span class="badge assigned">In Progress</span>
+              </div>
+              <p style="font-size: 0.8em; color: var(--muted); margin-top: 4px;">Driver: Ahmed · QAR 85.00</p>
+            </div>
+            <div class="list-item">
+              <div class="list-item-header">
+                <span class="list-item-title">Jumpstart - Nissan</span>
+                <span class="badge created">Searching</span>
+              </div>
+              <p style="font-size: 0.8em; color: var(--muted); margin-top: 4px;">Unassigned · QAR 60.00</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="screen-fleet" class="screen">
+      <div class="card">
+        <h2>🚗 Fleet Management</h2>
+        <div class="list-grid">
+          <div class="list-item">
+            <div class="list-item-header">
+              <span class="list-item-title">Ahmed Ali</span>
+              <span class="badge payment_completed">Online</span>
+            </div>
+            <p style="font-size: 0.8em; color: var(--muted); margin-top: 4px;">Vehicle: Toyota Land Cruiser (QA-12345)</p>
+            <button class="btn small secondary" style="margin-top: 12px;">View Details</button>
+          </div>
+          <div class="list-item">
+            <div class="list-item-header">
+              <span class="list-item-title">Rashid Khan</span>
+              <span class="badge cancelled">Offline</span>
+            </div>
+            <p style="font-size: 0.8em; color: var(--muted); margin-top: 4px;">Vehicle: Ford F-150 (QA-67890)</p>
+            <button class="btn small secondary" style="margin-top: 12px;">View Details</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="screen-history" class="screen">
+      <div class="card">
+        <h2>📋 Booking History</h2>
+        <div class="list-grid">
+          <div class="list-item">
+            <div class="list-item-header">
+              <span class="list-item-title">Flat Tire - Al Sadd</span>
+              <span class="badge trip_completed">Completed</span>
+            </div>
+            <p style="font-size: 0.8em; color: var(--muted); margin-top: 4px;">QAR 45.00 · Today, 2:30 PM</p>
+          </div>
+          <div class="list-item">
+            <div class="list-item-header">
+              <span class="list-item-title">Towing - West Bay</span>
+              <span class="badge trip_completed">Completed</span>
+            </div>
+            <p style="font-size: 0.8em; color: var(--muted); margin-top: 4px;">QAR 120.00 · Today, 11:15 AM</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="screen-profile" class="screen">
+      <div class="card">
+        <h2>🏢 Agency Profile</h2>
+        <div class="list-item" style="margin-bottom: 12px;"><div class="list-item-title">Company Details</div></div>
+        <div class="list-item" style="margin-bottom: 12px;"><div class="list-item-title">Billing & Payments</div></div>
+        <div class="list-item"><div class="list-item-title" style="color: var(--danger);">Support</div></div>
+      </div>
+    </section>
+
+  </main>
+
+  <nav class="bottom-nav">
+    <a href="#" class="nav-item active" onclick="switchTab('dashboard', event)"><span class="nav-icon">🏠</span><span data-i18n="nav.dashboard">Dashboard</span></a>
+    <a href="#" class="nav-item" onclick="switchTab('fleet', event)"><span class="nav-icon">🚗</span><span data-i18n="nav.fleet">Fleet</span></a>
+    <a href="#" class="nav-item" onclick="switchTab('history', event)"><span class="nav-icon">📋</span><span data-i18n="nav.history">History</span></a>
+    <a href="#" class="nav-item" onclick="switchTab('profile', event)"><span class="nav-icon">👤</span><span data-i18n="nav.profile">Profile</span></a>
+  </nav>
+
+  <script src="theme.js"></script>
+  <script src="i18n.js"></script>
+  <script>
+    function switchTab(tabName, event) {
+      if (event) event.preventDefault();
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      const targetScreen = document.getElementById(`screen-${tabName}`);
+      if (targetScreen) targetScreen.classList.add('active');
+      if (event && event.currentTarget) event.currentTarget.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
+
+

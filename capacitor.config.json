@@ -1,0 +1,9 @@
+﻿{
+  "appId": "com.vra.app",
+  "appName": "Vehicle Recovery",
+  "webDir": "public",
+  "server": {
+    "url": "http://192.168.1.25:3000",
+    "cleartext": true
+  }
+}

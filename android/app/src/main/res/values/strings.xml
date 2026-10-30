@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Vehicle Recovery</string>
+    <string name="title_activity_main">Vehicle Recovery</string>
+    <string name="package_name">com.vra.app</string>
+    <string name="custom_url_scheme">com.vra.app</string>
+</resources>

@@ -1,77 +1,270 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Customer Dashboard - Vehicle Recovery</title>
-<link rel="stylesheet" href="/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vehicle Recovery - Customer</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#84cc16">
+    
+    <!-- Leaflet Maps & Socket.io -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    
+    <style>
+        :root {
+            --lime: #84cc16;
+            --dark: #0a0a0a;
+            --bg: #f4f6f8;
+            --card: #ffffff;
+            --fg: #1a1a1a;
+            --muted: #6b7280;
+            --border: #e5e7eb;
+        }
+        * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+        body { background: var(--bg); margin: 0; padding-bottom: 80px; color: var(--fg); }
+        
+        /* Header */
+        header { background: var(--card); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+        .logo { display: flex; align-items: center; gap: 12px; }
+        .logo img { width: 36px; height: 36px; border-radius: 10px; }
+        .logo h1 { font-size: 20px; margin: 0; font-weight: 800; letter-spacing: -0.5px; }
+        
+        /* Main Container */
+        main { max-width: 600px; margin: 20px auto; padding: 0 15px; }
+        
+        /* Cards */
+        .card { background: var(--card); border-radius: 16px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); margin-bottom: 20px; }
+        .card h2 { margin-top: 0; margin-bottom: 15px; font-size: 18px; }
+        
+        /* Inputs */
+        .input-group { display: flex; align-items: center; background: #f3f4f6; border-radius: 10px; padding: 12px 15px; margin-bottom: 12px; border: 2px solid transparent; transition: 0.3s; }
+        .input-group:focus-within { border-color: var(--lime); }
+        .input-group input { border: none; background: transparent; width: 100%; outline: none; font-size: 15px; color: var(--fg); }
+        .input-group span { font-size: 18px; margin-right: 10px; }
+        
+        /* Buttons */
+        .btn { width: 100%; padding: 15px; font-size: 16px; font-weight: 700; border-radius: 10px; background: var(--lime); color: var(--dark); border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(132,204,22,0.3); }
+        .btn-outline { background: #e5e7eb; color: var(--fg); box-shadow: none; width: auto; padding: 8px 14px; font-size: 13px; border-radius: 20px; }
+        
+        /* Map Container */
+        #map-container { height: 200px; width: 100%; border-radius: 12px; margin-top: 15px; z-index: 1; border: 1px solid var(--border); }
+        
+        /* List Items */
+        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #f9fafb; border-radius: 10px; margin-bottom: 10px; }
+        .list-item strong { display: block; font-size: 15px; }
+        .list-item span { font-size: 13px; color: var(--muted); }
+        .btn-delete { background: #fee2e2; color: #ef4444; border: none; padding: 8px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 12px; }
+        
+        /* Modals */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; }
+        .modal-content { background: #fff; border-radius: 16px; width: 90%; max-width: 400px; padding: 25px; }
+        .modal-content input { width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 10px; border: 1px solid var(--border); background: #f9fafb; font-size: 15px; }
+        
+        /* Bottom Nav */
+        nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--card); box-shadow: 0 -2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-around; padding: 12px 0; z-index: 100; }
+        nav a { display: flex; flex-direction: column; align-items: center; color: var(--muted); text-decoration: none; font-size: 12px; font-weight: bold; }
+        nav a.active { color: var(--lime); }
+        nav a span { font-size: 22px; margin-bottom: 4px; }
+        
+        /* Live Tracking Overlay */
+        #live-tracking-container { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99999; background: #fff; }
+        #live-tracking-map { width: 100%; height: 100%; }
+    </style>
+<link rel="icon" type="image/png" href="/icon-192.png">`n<style>
+    /* Uber-Style Fixed Bottom Nav */
+    .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: #ffffff;
+        border-top: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-around;
+        padding: 10px 0;
+        z-index: 1000;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+    }
+    .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        color: #6b7280;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        background: none;
+        border: none;
+    }
+    .nav-item.active {
+        color: #84cc16;
+    }
+    .nav-item .icon {
+        font-size: 20px;
+        margin-bottom: 4px;
+    }
+</style>
 </head>
 <body>
-<header>
-  <div class="container">
-    <div class="brand">Vehicle Recovery <span>· Customer</span></div>
-    <nav>
-      <span style="color:var(--muted);">Hello, <strong id="user-name">...</strong></span>
-      <a href="#" id="logout-btn">Logout</a>
+    <main id="tab-services" style="display: none; max-width: 600px; margin: 20px auto; padding: 0 15px;">
+        <div style="background:#fff; border-radius:16px; padding:30px; text-align:center; box-shadow:0 4px 20px rgba(0,0,0,0.06);">
+            <h2 style="margin-top:0;">🛠️ Services</h2>
+            <p style="color:#6b7280;">Service selection coming soon.</p>
+        </div>
+    </main>
+    <main id="tab-activity" style="display: none; max-width: 600px; margin: 20px auto; padding: 0 15px;">
+        <div style="background:#fff; border-radius:16px; padding:30px; text-align:center; box-shadow:0 4px 20px rgba(0,0,0,0.06);">
+            <h2 style="margin-top:0;">📋 Activity</h2>
+            <p style="color:#6b7280;">Your booking history will appear here.</p>
+        </div>
+    </main>
+    <main id="tab-account" style="display: none; max-width: 600px; margin: 20px auto; padding: 0 15px;">
+        <div style="background:#fff; border-radius:16px; padding:30px; text-align:center; box-shadow:0 4px 20px rgba(0,0,0,0.06);">
+            <h2 style="margin-top:0;">👤 Account</h2>
+            <p style="color:#6b7280;">Profile settings coming soon.</p>
+        </div>
+    </main>
+
+    <header>
+        <div class="logo">
+            <img src="/icon-192.png" alt="Logo">
+            <h1>Vehicle Recovery</h1>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <button style="background: #fff; border: 1px solid var(--border); padding: 6px 12px; border-radius: 20px; font-weight: 600; cursor: pointer;">العربية</button>
+            <button style="background: #fee2e2; color: #ef4444; border: none; padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 14px; cursor: pointer;">Logout</button>
+        </div>
+    </header>
+
+    <main id="tab-home">
+        <div class="card">
+            <h2>🚨 New Recovery</h2>
+            
+            <label style="font-size: 12px; color: var(--muted); display: block; margin-bottom: 5px;">PICKUP LOCATION</label>
+            <div class="input-group">
+                <input type="text" id="pickup-loc" placeholder="e.g. Doha, Industrial Area">
+            </div>
+            
+            <label style="font-size: 12px; color: var(--muted); display: block; margin-bottom: 5px;">DESTINATION</label>
+            <div class="input-group">
+                <input type="text" id="dest-loc" placeholder="e.g. Garage, Salwa Road">
+            </div>
+            
+            <label style="font-size: 12px; color: var(--muted); display: block; margin-bottom: 5px;">YOUR VEHICLE REGISTRATION</label>
+            <div class="input-group">
+                <input type="text" id="vehicle-reg" placeholder="e.g. QA-12345">
+            </div>
+
+            <button class="btn" onclick="console.log('Booking clicked')">Get Estimate & Book</button>
+            
+            <!-- MAP IS BACK HERE -->
+            <div id="map-container"></div>
+        </div>
+
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2 style="margin: 0;">🚗 Your Vehicles</h2>
+                <button class="btn btn-outline" onclick="openModal('vehicle-modal')">+ Add Vehicle</button>
+            </div>
+            <div id="vehicles-list"></div>
+        </div>
+
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2 style="margin: 0;">📍 Saved Destinations</h2>
+                <button class="btn btn-outline" onclick="openModal('dest-modal')">+ Add Place</button>
+            </div>
+            <div id="destinations-list"></div>
+        </div>
+    </main>
+
+        <!-- Other Tabs (Hidden by default) -->
+    
+
+    
+
+    
+
+        <a href="#" class="active"><span>🏠</span>Home</a>
+        <a href="#"><span>🛠️</span>Services</a>
+        <a href="#"><span>📋</span>Activity</a>
+        <a href="#"><span>👤</span>Account</a>
     </nav>
-  </div>
-</header>
-<main class="container">
-  <div class="info" id="country-info">Loading...</div>
 
-  <div class="grid cols-2">
-    <div class="card">
-      <h2>🚨 New Recovery</h2>
-      <form id="new-booking-form">
-        <div class="form-group">
-          <label>Pickup location</label>
-          <input type="text" id="bk-pickup" placeholder="e.g. Doha, Industrial Area" required>
+    <div id="vehicle-modal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-top: 0;">Add New Vehicle</h3>
+            <input type="text" id="v-make" placeholder="Make (e.g. Toyota)">
+            <input type="text" id="v-model" placeholder="Model (e.g. Corolla)">
+            <input type="text" id="v-reg" placeholder="Registration (e.g. QA-12345)">
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px;">
+                <button class="btn btn-outline" onclick="closeModal('vehicle-modal')">Cancel</button>
+                <button class="btn" style="width: auto; padding: 10px 20px;" onclick="saveVehicle()">Save</button>
+            </div>
         </div>
-        <div class="form-group">
-          <label>Destination</label>
-          <input type="text" id="bk-destination" placeholder="e.g. Garage, Salwa Road" required>
-        </div>
-        <div class="form-group">
-          <label>Your vehicle registration</label>
-          <input type="text" id="bk-plate" placeholder="e.g. QA-12345" required>
-        </div>
-        <button type="submit" class="btn success">Get Estimate & Book</button>
-      </form>
     </div>
 
-    <div class="card">
-      <h2>Your Vehicles</h2>
-      <table>
-        <thead><tr><th>Category</th><th>Plate</th><th>Make/Model</th><th></th><th></th></tr></thead>
-        <tbody id="vehicles-tbody"><tr><td colspan="5">Loading...</td></tr></tbody>
-      </table>
-      <details style="margin-top:16px;">
-        <summary style="cursor:pointer;color:var(--primary);">+ Add Vehicle</summary>
-        <form id="add-vehicle-form" style="margin-top:12px;">
-          <div class="form-group"><label>Category</label>
-            <select id="v-category"><option value="suv">SUV</option><option value="sedan_hatchback">Sedan/Hatchback</option><option value="pickup">Pickup</option><option value="van">Van</option><option value="truck">Truck</option><option value="motorcycle">Motorcycle</option></select>
-          </div>
-          <div class="form-group"><label>Plate</label><input type="text" id="v-plate" required></div>
-          <div class="form-group"><label>Make</label><input type="text" id="v-make"></div>
-          <div class="form-group"><label>Model</label><input type="text" id="v-model"></div>
-          <button class="btn small" type="submit">Add</button>
-        </form>
-      </details>
+    <div id="dest-modal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-top: 0;">Add New Destination</h3>
+            <input type="text" id="d-name" placeholder="Name (e.g. My Garage)">
+            <input type="text" id="d-address" placeholder="Address (e.g. Salwa Road)">
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px;">
+                <button class="btn btn-outline" onclick="closeModal('dest-modal')">Cancel</button>
+                <button class="btn" style="width: auto; padding: 10px 20px;" onclick="saveDestination()">Save</button>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <div class="card">
-    <h2>Your Bookings</h2>
-    <table>
-      <thead><tr><th>#</th><th>Service</th><th>Status</th><th>Fare</th><th>Created</th><th></th></tr></thead>
-      <tbody id="bookings-tbody"><tr><td colspan="6">Loading...</td></tr></tbody>
-    </table>
-  </div>
+    <div id="live-tracking-container">
+        <button style="position: absolute; top: 20px; right: 20px; z-index: 1000; background: #fff; border: none; padding: 10px 15px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); font-weight: bold; cursor: pointer;" onclick="document.getElementById('live-tracking-container').style.display='none'">❌ Close</button>
+        <div id="live-tracking-map"></div>
+    </div>
 
-  <div class="card" id="tracking-details">
-    <p style="color:var(--muted);">Click "Track" on a booking to view details.</p>
-  </div>
-</main>
+    <script src="/app.js"></script>
+    <!-- UBER-STYLE BOTTOM NAV -->
+    
+<style>
+    .app-bottom-nav {
+        position: fixed; bottom: 0; left: 0; width: 100%;
+        background: #ffffff; border-top: 1px solid #e5e7eb;
+        display: flex; justify-content: space-around; padding: 10px 0;
+        z-index: 9999; box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+    }
+    .app-nav-btn {
+        display: flex; flex-direction: column; align-items: center;
+        color: #6b7280; text-decoration: none; font-size: 12px; font-weight: 600;
+        cursor: pointer; background: none; border: none; padding: 5px 15px;
+    }
+    .app-nav-btn.active { color: #84cc16; }
+    .app-nav-btn span { font-size: 20px; margin-bottom: 4px; }
+</style>
+
+
+
+<!-- App.js ഉറപ്പായും ലോഡ് ആക്കുന്നു -->
+<script src="/app.js"></script>
+<style>
+    .app-bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-around; padding: 10px 0; z-index: 9999; }
+    .app-nav-btn { display: flex; flex-direction: column; align-items: center; color: #6b7280; font-size: 12px; font-weight: 600; cursor: pointer; background: none; border: none; padding: 5px 15px; }
+    .app-nav-btn.active { color: #84cc16; }
+    .app-nav-btn span { font-size: 20px; margin-bottom: 4px; }
+</style>
+<nav class="app-bottom-nav">
+    <button class="app-nav-btn active" id="nav-home" onclick="switchTab('home')"><span>🏠</span>Home</button>
+    <button class="app-nav-btn" id="nav-services" onclick="switchTab('services')"><span>🛠️</span>Services</button>
+    <button class="app-nav-btn" id="nav-activity" onclick="switchTab('activity')"><span>📋</span>Activity</button>
+    <button class="app-nav-btn" id="nav-account" onclick="switchTab('account')"><span>👤</span>Account</button>
+</nav>
 <script src="/app.js"></script>
 </body>
 </html>
+
+
+
+
