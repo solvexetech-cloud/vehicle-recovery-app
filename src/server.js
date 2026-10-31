@@ -47,12 +47,22 @@ io.on('connection', (socket) => {
 });
 
 // Start server
-server.listen(config.port, config.host, () => {
+server.listen(config.port, config.host, async () => {
   log.info('server.listening', {
     url: 'http://localhost:' + config.port,
     env: config.nodeEnv,
     version: config.appVersion
   });
+
+  // Auto-seed demo data on first startup
+  try {
+    const { openDatabase } = require('./db');
+    const db = openDatabase(config.dbPath);
+    const { ensureDemoData } = require('./seed/demo');
+    await ensureDemoData(db);
+  } catch (e) {
+    log.error('auto_seed_failed', { err: e.message });
+  }
 });
 
 function shutdown(signal) {
