@@ -219,9 +219,21 @@
     async function checkIncomingOffers() {
         try {
             const list = await apiFetch('/api/driver/bookings/incoming');
-            const offers = Array.isArray(list) ? list : (list.offers || list.bookings || []);
+            const offers = Array.isArray(list) ? list 
+                  : (list.offer ? [list.offer] 
+                  : (list.offers || list.bookings || list.incoming || list.data || []));
+            
             if (offers.length > 0 && !driverState.currentOffer) {
                 showOffer(offers[0]);
+            } else if (offers.length === 0 && driverState.currentOffer) {
+                // Backend says no offer — clear stale UI
+                driverState.currentOffer = null;
+                if (driverState.offerTimer) {
+                    clearInterval(driverState.offerTimer);
+                    driverState.offerTimer = null;
+                }
+                const panel = document.getElementById('offer-panel');
+                if (panel) panel.style.display = 'none';
             }
         } catch(e) {}
     }
@@ -260,7 +272,7 @@
         if (!offer || !offer.id) return;
         if (driverState.offerTimer) clearInterval(driverState.offerTimer);
         try {
-            await apiFetch('/api/driver/bookings/' + offer.id + '/accept', { method: 'POST' });
+            await apiFetch('/api/driver/bookings/' + (offer.booking_id || offer.id) + '/accept', { method: 'POST' });
             driverState.currentOffer = null;
             const panel = document.getElementById('offer-panel');
             if (panel) panel.style.display = 'none';
@@ -277,7 +289,7 @@
         if (!offer || !offer.id) return;
         if (driverState.offerTimer) clearInterval(driverState.offerTimer);
         try {
-            await apiFetch('/api/driver/bookings/' + offer.id + '/reject', { method: 'POST' });
+            await apiFetch('/api/driver/bookings/' + (offer.booking_id || offer.id) + '/reject', { method: 'POST' });
         } catch(e) {}
         driverState.currentOffer = null;
         const panel = document.getElementById('offer-panel');

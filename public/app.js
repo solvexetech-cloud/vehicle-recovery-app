@@ -90,14 +90,131 @@
 
     window.startLiveTracking = function(bookingId) {
         const container = document.getElementById('live-tracking-container');
-        if(container) container.style.display = 'block';
+        if (container) container.style.display = 'block';
         
-        if(!trackMap) {
-            trackMap = L.map('live-tracking-map').setView([25.2854, 51.5310], 14);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(trackMap);
+        if (!window._trackMap) {
+            window._trackMap = L.map('live-tracking-map').setView([25.2854, 51.5310], 14);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(window._trackMap);
+            
+            const carSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#84cc16" stroke="#0a0a0a" stroke-width="2"><path d="M10 17h4V5H2v12h3m10 0h4m-4 0a3 3 0 1 1-6 0m6 0a3 3 0 1 0 6 0M9 17a3 3 0 1 1-6 0m6 0a3 3 0 1 0 6 0"/><path d="M22 17h-4V9h3l3 4v4z"/></svg>';
+            const carIcon = L.icon({ iconUrl: 'data:image/svg+xml;utf8,' + encodeURIComponent(carSvg), iconSize: [40, 40], iconAnchor: [20, 20] });
+            
+            window._pickupCoords = [25.2854, 51.5310];
+            window._pickupMarker = L.marker(window._pickupCoords, { icon: L.divIcon({ className: 'pickup-marker', html: '<div style="background:#84cc16;width:16px;height:16px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.3);"></div>', iconSize: [22, 22] }) }).addTo(window._trackMap);
+            window._pickupMarker.bindPopup('📍 Pickup');
+            
+            window._driverMarker = L.marker([25.2854, 51.5310], {icon: carIcon}).addTo(window._trackMap);
+            window._driverMarker.bindPopup('🚗 Driver');
+            
+            window._remainingLine = L.polyline([], {color: '#84cc16', weight: 6, opacity: 0.9}).addTo(window._trackMap);
+            window._completedLine = L.polyline([], {color: '#f59e0b', weight: 6, opacity: 0.9}).addTo(window._trackMap);
+            window._driverHistory = [];
         }
-        setTimeout(() => trackMap.invalidateSize(), 200);
-        if(localSocket) localSocket.emit('join_trip', { bookingId, role: 'customer' });
+        
+        setTimeout(function() { window._trackMap.invalidateSize(); }, 200);
+        
+        fetch('/api/customer/bookings/' + bookingId, { credentials: 'include' })
+            .then(r => r.json())
+            .then(booking => {
+                if (booking.pickup_lat && booking.pickup_lng) {
+                    window._pickupCoords = [booking.pickup_lat, booking.pickup_lng];
+                    if (window._pickupMarker) window._pickupMarker.setLatLng(window._pickupCoords);
+                }
+            }).catch(e => console.warn('Booking:', e));
+        
+        if (typeof io !== 'undefined') {
+            try { io().emit('join_trip', { bookingId: bookingId, role: 'customer' }); } catch(e) {}
+        }
+        
+        if (window._trackingInterval) clearInterval(window._trackingInterval);
+        window._trackingInterval = setInterval(async function() {
+            try {
+                const res = await fetch('/api/customer/bookings/' + bookingId + '/tracking', { credentials: 'include' });
+                if (!res.ok) return;
+                const data = await res.json();
+                // Backend structure: { driver: {...}, live: { driver_gps: {lat, lng} } }
+                const gps = (data.live && data.live.driver_gps) 
+                    || (data.driver && data.driver.last_gps_lat ? { lat: data.driver.last_gps_lat, lng: data.driver.last_gps_lng } : null);
+                
+                if (gps && gps.lat && gps.lng) {
+                    window._updateDriverPos(gps.lat, gps.lng);
+                    
+                    // Also show distance from live data
+                    if (data.live && data.live.distance_to_pickup_km !== undefined) {
+                        const info = document.getElementById('tracking-info');
+                        if (info) {
+                            const distKm = data.live.distance_to_pickup_km.toFixed(2);
+                            info.innerHTML = '<div style="font-size:1.1em;font-weight:700;color:#84cc16;">' + distKm + ' km away</div>'
+                                + '<div style="font-size:0.85em;color:#6b7280;">To pickup</div>';
+                        }
+                    }
+                }
+            } catch(e) {}
+        }, 2000);
+        
+        setTimeout(async function() {
+            try {
+                const res = await fetch('/api/customer/bookings/' + bookingId + '/tracking', { credentials: 'include' });
+                if (!res.ok) return;
+                const data = await res.json();
+                const gps2 = (data.live && data.live.driver_gps) || (data.driver && data.driver.last_gps_lat ? { lat: data.driver.last_gps_lat, lng: data.driver.last_gps_lng } : null); if (gps2 && gps2.lat) window._updateDriverPos(gps2.lat, gps2.lng);
+            } catch(e) {}
+        }, 500);
+    };
+
+    window._updateDriverPos = function(lat, lng) {
+        if (!window._trackMap || !window._driverMarker) return;
+        const pos = [lat, lng];
+        
+        if (window._driverHistory.length > 0) {
+            const last = window._driverHistory[window._driverHistory.length - 1];
+            if (last[0] !== lat || last[1] !== lng) {
+                window._driverHistory.push(pos);
+                // Fetch OSRM route for completed path (yellow trail)
+                const from = [last[0], last[1]];
+                const to = pos;
+                fetchRouteLine(from, to, window._completedLine);
+            }
+        } else {
+            window._driverHistory.push(pos);
+        }
+        
+        window._driverMarker.setLatLng(pos);
+        window._fetchRoute(pos, window._pickupCoords);
+    };
+
+    // Draw route line using OSRM (replaces straight line)
+    function fetchRouteLine(from, to, polyline) {
+        const url = 'https://router.project-osrm.org/route/v1/driving/' +
+            from[1] + ',' + from[0] + ';' + to[1] + ',' + to[0] +
+            '?overview=full&geometries=geojson';
+        
+        fetch(url)
+            .then(r => r.json())
+            .then(data => {
+                if (data.routes && data.routes[0]) {
+                    const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+                    polyline.setLatLngs(coords);
+                }
+            })
+            .catch(e => {
+                // Fallback: straight line
+                polyline.setLatLngs([from, to]);
+            });
+    }
+
+    window._fetchRoute = function(from, to) {
+        const url = 'https://router.project-osrm.org/route/v1/driving/' + from[1] + ',' + from[0] + ';' + to[1] + ',' + to[0] + '?overview=full&geometries=geojson';
+        fetch(url).then(r => r.json()).then(data => {
+            if (data.routes && data.routes[0]) {
+                const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+                window._remainingLine.setLatLngs(coords);
+                const distKm = (data.routes[0].distance / 1000).toFixed(1);
+                const etaMin = Math.ceil(data.routes[0].duration / 60);
+                const info = document.getElementById('tracking-info');
+                if (info) info.innerHTML = '<div style="font-size:1.1em;font-weight:700;color:#84cc16;">' + distKm + ' km</div><div style="font-size:0.85em;color:#6b7280;">ETA: ' + etaMin + ' min</div>';
+            }
+        }).catch(e => console.warn('OSRM:', e));
     };
 
     if(localSocket) {
@@ -259,19 +376,48 @@
         if (!pickup) return showToast('Pickup location required', 'error');
         if (!dest) return showToast('Destination required', 'error');
         try {
-            const payload = {
-                serviceType: serviceType,
-                serviceLevel: level,
-                pickupAddress: pickup,
-                pickupLat: 25.2854,
-                pickupLng: 51.5310,
-                destinationAddress: dest,
-                destinationLat: 25.2854,
-                destinationLng: 51.5310,
-                vehicleRegistration: reg || null,
-                customerVehicle: { category: 'suv', make: 'Unknown', model: 'Unknown', registration: reg || null }
+            const estimatePayload = {
+                service_type: serviceType,
+                service_level: level,
+                pickup: { lat: 25.2854, lng: 51.5310, address: pickup },
+                destination: { lat: 25.2854, lng: 51.5310, address: dest },
+                vehicle: { category: 'suv', registration_number: reg || 'QA-00000' }
             };
-            const booking = await apiFetch('/api/customer/bookings', { method: 'POST', body: payload });
+            const estimate = await apiFetch('/api/customer/bookings/estimate', {
+                method: 'POST',
+                body: estimatePayload
+            });
+            const agreedFare = estimate && estimate.fare_breakdown ? estimate.fare_breakdown.total_minor : 0;
+            if (!agreedFare) {
+                return showToast('Could not get fare estimate', 'error');
+            }
+            const bookingPayload = {
+                service_type: serviceType,
+                service_level: level,
+                pickup: { lat: 25.2854, lng: 51.5310, address: pickup },
+                destination: { lat: 25.2854, lng: 51.5310, address: dest },
+                vehicle: { category: 'suv', registration_number: reg || 'QA-00000' },
+                agreed_fare_minor: agreedFare
+            };
+                        const bookingResp = await apiFetch('/api/customer/bookings', { method: 'POST', body: bookingPayload });
+            
+            // Extract from nested shape: { ok: true, booking: { id, ... } }
+            const booking = bookingResp.booking || bookingResp;
+            const bookingId = booking.id || bookingResp.id;
+            
+            console.log('📦 Booking created:', bookingId);
+            
+            // Trigger dispatch automatically
+            if (bookingId) {
+                try {
+                    console.log('🚀 Dispatching booking', bookingId);
+                    const dispatchResult = await apiFetch('/api/customer/bookings/' + bookingId + '/dispatch', { method: 'POST' });
+                    console.log('✅ Dispatch result:', dispatchResult.dispatch?.status);
+                } catch(dispatchErr) {
+                    console.warn('❌ Dispatch failed:', dispatchErr.message);
+                }
+            }
+            
             showToast('Booking created! Searching for driver...', 'success');
             if (booking && booking.id) {
                 loadActiveBooking();
@@ -283,7 +429,7 @@
         } catch(e) {
             showToast('Booking failed: ' + e.message, 'error');
         }
-    };
+    };;
 
     // ─── Active booking loader ───
     async function loadActiveBooking() {
@@ -291,7 +437,9 @@
         try {
             const list = await apiFetch('/api/customer/bookings');
             const arr = Array.isArray(list) ? list : (list.bookings || list.items || []);
-            const active = arr.find(function(b) {
+            // Sort by ID descending to get newest first
+            const sorted = arr.slice().sort(function(a, b) { return (b.id || 0) - (a.id || 0); });
+            const active = sorted.find(function(b) {
                 return b && b.status && !['trip_completed','cancelled','payment_completed','no_driver_available'].includes(b.status);
             });
             const panel = document.getElementById('active-booking-panel');
@@ -301,9 +449,20 @@
                 const statusEl = document.getElementById('active-booking-status');
                 if (statusEl) statusEl.textContent = String(active.status || '').replace(/_/g,' ').toUpperCase();
                 if (statusEl) statusEl.className = 'badge ' + (active.status || '');
-                if (info) info.innerHTML = 'Booking #' + (active.bookingNumber || active.id) + '<br>'
-                    + 'From: ' + (active.pickupAddress || '—') + '<br>'
-                    + 'To: ' + (active.destinationAddress || '—');
+                if (info) {
+                    const bNum = active.booking_number || active.bookingNumber || active.id;
+                    const pAddr = active.pickup_address || active.pickupAddress 
+                                  || (active.pickup && active.pickup.address) || '—';
+                    const dAddr = active.destination_address || active.destinationAddress 
+                                  || (active.destination && active.destination.address) || '—';
+                    const fare = active.agreed_fare_minor 
+                                 ? 'QAR ' + (active.agreed_fare_minor / 100).toFixed(2) 
+                                 : '';
+                    info.innerHTML = 'Booking #' + bNum 
+                        + (fare ? ' • ' + fare : '')
+                        + '<br>📍 ' + pAddr 
+                        + '<br>🏁 ' + dAddr;
+                }
                 window._activeBooking = active;
             } else if (panel) {
                 panel.style.display = 'none';
