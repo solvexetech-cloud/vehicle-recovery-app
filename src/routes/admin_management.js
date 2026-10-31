@@ -1,10 +1,9 @@
 ﻿const express = require('express');
 const router = express.Router();
 const { DatabaseSync } = require('node:sqlite');
-const path = require('path');
+const config = require('../config');
 
-const dbPath = path.join(__dirname, '..', '..', 'data', 'app.db');
-const db = new DatabaseSync(dbPath);
+const db = new DatabaseSync(config.dbPath);
 
 // --- GET ALL ---
 router.get('/users', (req, res) => {
