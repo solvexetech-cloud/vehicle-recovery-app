@@ -245,9 +245,9 @@
         panel.style.display = 'block';
         const details = document.getElementById('offer-details');
         if (details) {
-            const pickup = offer.pickupAddress || offer.pickup_address || '—';
-            const dest = offer.destinationAddress || offer.destination_address || '—';
-            const fare = offer.estimatedFare || offer.estimated_fare || '—';
+            const pickup = (offer.pickup && offer.pickup.address) || offer.pickupAddress || offer.pickup_address || '—';
+            const dest = (offer.destination && offer.destination.address) || offer.destinationAddress || offer.destination_address || '—';
+            const fare = offer.agreed_fare_minor ? (offer.agreed_fare_minor / 100).toFixed(2) : (offer.estimatedFare || offer.estimated_fare || '—');
             details.innerHTML = '<div style="margin-bottom:8px;"><strong>📍 Pickup:</strong> ' + pickup + '</div>'
                 + '<div style="margin-bottom:8px;"><strong>🏁 Destination:</strong> ' + dest + '</div>'
                 + '<div><strong>💰 Fare:</strong> QAR ' + fare + '</div>';
@@ -322,8 +322,8 @@
         }
         if (info) {
             info.innerHTML = 'Booking #' + (trip.bookingNumber || trip.booking_number || trip.id) + '<br>'
-                + '📍 ' + (trip.pickupAddress || trip.pickup_address || '—') + '<br>'
-                + '🏁 ' + (trip.destinationAddress || trip.destination_address || '—');
+                + '📍 ' + ((trip.pickup && trip.pickup.address) || trip.pickupAddress || trip.pickup_address || '—') + '<br>'
+                + '🏁 ' + ((trip.destination && trip.destination.address) || trip.destinationAddress || trip.destination_address || '—');
         }
         renderTripTab(trip);
     }
@@ -362,8 +362,8 @@
             + '<span class="badge ' + status + '">' + status.replace(/_/g,' ').toUpperCase() + '</span>'
             + '</div>'
             + '<div style="font-size:0.9em;color:var(--muted);margin-bottom:16px;">'
-            + '📍 <strong>From:</strong> ' + (trip.pickupAddress || trip.pickup_address || '—') + '<br>'
-            + '🏁 <strong>To:</strong> ' + (trip.destinationAddress || trip.destination_address || '—')
+            + '📍 <strong>From:</strong> ' + ((trip.pickup && trip.pickup.address) || trip.pickupAddress || trip.pickup_address || '—') + '<br>'
+            + '🏁 <strong>To:</strong> ' + ((trip.destination && trip.destination.address) || trip.destinationAddress || trip.destination_address || '—')
             + '</div>';
 
         if (actions.length > 0) {
