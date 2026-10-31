@@ -11,14 +11,10 @@
       - key: NODE_ENV
         value: production
       - key: DB_PATH
-        value: /var/data/app.db
+        value: /tmp/app.db
       - key: UPLOADS_DIR
-        value: /var/data/uploads
+        value: /tmp/uploads
       - key: JWT_SECRET
         generateValue: true
       - key: SESSION_SECRET
         generateValue: true
-    disk:
-      name: vra-data
-      mountPath: /var/data
-      sizeGB: 1
