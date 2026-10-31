@@ -494,18 +494,29 @@
             const list = await apiFetch('/api/customer/bookings');
             const arr = Array.isArray(list) ? list : (list.bookings || list.items || []);
             if (!arr.length) {
-                container.innerHTML = '<p style="text-align:center;color:var(--muted);padding:20px;">No bookings yet</p>';
+                container.innerHTML = '<div class="empty-compact"><div class="empty-compact-icon">📋</div><div class="empty-compact-body"><div class="empty-compact-title">No bookings yet</div><div class="empty-compact-sub">Your trips will appear here</div></div></div>';
                 return;
             }
             container.innerHTML = arr.map(function(b) {
                 const status = String(b.status || '');
-                return '<div class="list-item">'
-                    + '<div class="list-item-header"><div class="list-item-title">#' + (b.bookingNumber || b.id) + '</div>'
+                const bNum = b.booking_number || b.bookingNumber || b.id;
+                const pAddr = b.pickup_address || b.pickupAddress || (b.pickup && b.pickup.address) || '—';
+                const dAddr = b.destination_address || b.destinationAddress || (b.destination && b.destination.address) || '—';
+                const fareMinor = b.agreed_fare_minor || b.final_fare_minor || b.estimated_fare_minor;
+                const fare = fareMinor ? (fareMinor / 100).toFixed(2) : '';
+                const date = b.created_at || b.createdAt || b.completed_at;
+                const dateStr = date ? new Date(date).toLocaleDateString() : '';
+                
+                return '<div class="list-item" onclick="openBookingDetails(' + b.id + ')" style="cursor:pointer;">'
+                    + '<div class="list-item-header"><div class="list-item-title">#' + bNum + '</div>'
                     + '<span class="badge ' + status + '">' + status.replace(/_/g,' ').toUpperCase() + '</span></div>'
-                    + '<div style="color:var(--muted);font-size:0.85em;">'
-                    + (b.pickupAddress || '—') + ' → ' + (b.destinationAddress || '—')
+                    + '<div style="color:var(--muted);font-size:0.85em;margin-top:4px;">'
+                    + '📍 ' + pAddr + '<br>🏁 ' + dAddr
                     + '</div>'
-                    + (b.finalFare || b.estimatedFare ? '<div style="margin-top:8px;font-weight:600;">QAR ' + (b.finalFare || b.estimatedFare) + '</div>' : '')
+                    + '<div style="display:flex;justify-content:space-between;margin-top:8px;">'
+                    + (fare ? '<span style="color:var(--primary);font-weight:700;">QAR ' + fare + '</span>' : '<span></span>')
+                    + (dateStr ? '<span style="color:var(--muted);font-size:0.8em;">' + dateStr + '</span>' : '')
+                    + '</div>'
                     + '</div>';
             }).join('');
         } catch(e) {

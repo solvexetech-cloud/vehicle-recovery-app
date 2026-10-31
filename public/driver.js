@@ -554,9 +554,37 @@
                 set('today-earnings', 'QAR ' + today);
                 set('earnings-today', 'QAR ' + today);
                 set('earnings-week', 'QAR ' + week);
-                set('earnings-total', 'QAR ' + total);
+                set('earnings-total', 'QAR ' + (total / 100).toFixed(2)); await loadRecentTrips();
             }
         } catch(e) {}
+    }
+
+    async function loadRecentTrips() {
+        const container = document.getElementById('trip-history');
+        if (!container) return;
+        try {
+            const resp = await fetch('/api/driver/bookings/history', { credentials: 'include' });
+            let trips = [];
+            if (resp.ok) {
+                const data = await resp.json();
+                trips = data.bookings || (Array.isArray(data) ? data : []);
+            }
+            if (!trips.length) {
+                container.innerHTML = '<div class="empty-compact"><div class="empty-compact-icon">📋</div><div class="empty-compact-body"><div class="empty-compact-title">No trips yet</div><div class="empty-compact-sub">Completed trips will appear here</div></div></div>';
+                return;
+            }
+            container.innerHTML = trips.slice(0, 10).map(function(b) {
+                const bNum = b.booking_number || b.id;
+                const pAddr = b.pickup_address || '—';
+                const dAddr = b.destination_address || '—';
+                const fare = b.agreed_fare_minor ? (b.agreed_fare_minor / 100).toFixed(2) : '—';
+                const date = b.completed_at || b.created_at;
+                const dateStr = date ? new Date(date).toLocaleDateString() : '';
+                return '<div class="list-item"><div class="list-item-header"><div class="list-item-title">#' + bNum + '</div><span class="badge trip_completed">COMPLETED</span></div><div style="color:var(--muted);font-size:0.85em;margin-top:4px;">📍 ' + pAddr + ' → 🏁 ' + dAddr + '</div><div style="display:flex;justify-content:space-between;margin-top:8px;"><span style="color:var(--primary);font-weight:700;">QAR ' + fare + '</span>' + (dateStr ? '<span style="color:var(--muted);font-size:0.8em;">' + dateStr + '</span>' : '') + '</div></div>';
+            }).join('');
+        } catch(e) {
+            container.innerHTML = '<p style="color:var(--danger);padding:20px;">Failed to load</p>';
+        }
     }
 
     function startGpsTracking() {

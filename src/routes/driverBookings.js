@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const { requireRole } = require('../middleware/auth');
 const { Errors } = require('../errors');
 const { audit } = require('../audit');
@@ -52,6 +52,22 @@ function routes(db) {
     } catch (e) { next(e); }
   });
 
+  // ---- History (completed/cancelled bookings) ----
+  r.get('/history', (req, res, next) => {
+    try {
+      const driver = getDriver(req.user.id);
+      if (!driver) return next(Errors.notFound('driver_profile_not_found'));
+      
+      const bookings = db.prepare(
+        "SELECT id, booking_number, status, service_type, agreed_fare_minor, " +
+        "pickup_address, destination_address, created_at, completed_at, cancelled_at " +
+        "FROM bookings WHERE driver_id = ? AND status IN ('trip_completed', 'payment_completed', 'cancelled') " +
+        "ORDER BY id DESC LIMIT 50"
+      ).all(driver.id);
+      
+      res.json({ bookings: bookings });
+    } catch (e) { next(e); }
+  });
   // ---- Accept ----
   r.post('/:id/accept', (req, res, next) => {
     try {

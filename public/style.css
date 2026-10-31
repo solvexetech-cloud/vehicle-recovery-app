@@ -2231,3 +2231,76 @@ textarea:hover {
     border-color: #65A30D !important;
 }
 
+
+/* ═══════════════════════════════════════════════════════════════════
+   LIGHT THEME FIX — Neutral shadows, readable text
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Light mode — soft gray shadow instead of green glow */
+[data-theme="light"] .card,
+[data-theme="light"] .list-item,
+[data-theme="light"] .btn,
+[data-theme="light"] .info-bar {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-theme="light"] .card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Text colors in light mode — high contrast */
+[data-theme="light"] .card h2,
+[data-theme="light"] .card strong,
+[data-theme="light"] .list-item-title {
+    color: #1A1A1A !important;
+}
+
+[data-theme="light"] .muted,
+[data-theme="light"] [style*="color:var(--muted)"] {
+    color: #4B5563 !important;
+}
+
+/* Earnings numbers — dark text in light mode */
+[data-theme="light"] #today-earnings,
+[data-theme="light"] #earnings-today,
+[data-theme="light"] #earnings-week,
+[data-theme="light"] #earnings-total,
+[data-theme="light"] #today-rides,
+[data-theme="light"] #driver-trip-info strong {
+    color: #4D7C0F !important;
+}
+
+/* Summary card values — dark for readability */
+[data-theme="light"] [style*="color:var(--primary)"] {
+    color: #4D7C0F !important;
+}
+
+/* Badges — dark green text on light green bg */
+[data-theme="light"] .badge.trip_completed,
+[data-theme="light"] .badge.payment_completed {
+    background: rgba(5, 150, 105, 0.15) !important;
+    color: #059669 !important;
+}
+
+/* Map container shadow — light gray */
+[data-theme="light"] #map-container,
+[data-theme="light"] #driver-trip-map {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Remove green glow on primary buttons — use neutral shadow */
+[data-theme="light"] .btn {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+    color: #FFFFFF !important;
+}
+
+/* Bottom nav shadow — neutral */
+[data-theme="light"] .bottom-nav {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Trip items — neutralize green borders */
+[data-theme="light"] .list-item {
+    border: 1px solid #E5E7EB !important;
+}
+

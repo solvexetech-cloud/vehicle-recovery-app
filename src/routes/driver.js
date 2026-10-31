@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const { requireRole } = require('../middleware/auth');
 const { Errors } = require('../errors');
 const { audit } = require('../audit');
@@ -285,11 +285,33 @@ function routes(db) {
         if (wallet && wallet.balance) balance = wallet.balance;
       } catch (e) { /* wallet table issue - ignore */ }
       
+      // Calculate earnings from completed bookings
+      const now = new Date();
+      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+      const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+      
+      let todayEarnings = 0, weekEarnings = 0, totalEarnings = 0, todayRides = 0, totalRides = 0;
+      
+      try {
+        const completed = db.prepare(
+          "SELECT agreed_fare_minor, completed_at FROM bookings WHERE driver_id = ? AND status = 'trip_completed'"
+        ).all(driver.id);
+        
+        completed.forEach(b => {
+          const fare = b.agreed_fare_minor || 0;
+          totalEarnings += fare;
+          totalRides++;
+          if (b.completed_at >= todayStart) { todayEarnings += fare; todayRides++; }
+          if (b.completed_at >= weekAgo) weekEarnings += fare;
+        });
+      } catch (e) { /* no completed bookings */ }
+      
       res.json({
-        today: 0,
-        week: 0,
-        total: balance,
-        todayRides: 0,
+        today: todayEarnings,
+        week: weekEarnings,
+        total: totalEarnings + balance,
+        todayRides: todayRides,
+        totalRides: totalRides,
         walletBalance: balance
       });
     } catch (e) { next(e); }
