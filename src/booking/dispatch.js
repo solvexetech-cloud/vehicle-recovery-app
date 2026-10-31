@@ -1,8 +1,8 @@
-const { haversineKm, roundKm } = require('./fare');
+﻿const { haversineKm, roundKm } = require('./fare');
 const { evaluateEligibility } = require('../driver/eligibility');
 const { recordStatus } = require('./statusHistory');
 
-const DEFAULT_OFFER_TIMEOUT_MS = 20000;
+const DEFAULT_OFFER_TIMEOUT_MS = 60000;
 const DEFAULT_RADIUS_ROUNDS = [5, 10, 30];
 const DEFAULT_MAX_OFFERS_PER_ROUND = 10;
 
@@ -68,7 +68,7 @@ function expireStaleOffers(db, bookingId, now = nowIso()) {
 }
 
 /**
- * Create a new pending offer to a driver. Throws on UNIQUE constraint (safe — caller retries).
+ * Create a new pending offer to a driver. Throws on UNIQUE constraint (safe â€” caller retries).
  */
 function createOffer(db, { bookingId, driverId, roundNumber, radiusKm, distanceKm, expiresAt }) {
   const r = db.prepare(

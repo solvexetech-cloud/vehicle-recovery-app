@@ -2118,3 +2118,116 @@ textarea:hover {
     box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
 }
 
+
+/* ═══════════════════════════════════════════════════════════════════
+   LIGHT THEME FIX — Button text readability
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Primary buttons — dark text on light green background */
+[data-theme="light"] .btn,
+[data-theme="light"] body.driver-app .btn,
+[data-theme="light"] body.customer-app .btn {
+    background: linear-gradient(135deg, #65A30D 0%, #4D7C0F 100%) !important;
+    color: #FFFFFF !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.15) !important;
+}
+
+/* Hover state */
+[data-theme="light"] .btn:hover {
+    background: linear-gradient(135deg, #4D7C0F 0%, #365314 100%) !important;
+}
+
+/* Secondary buttons — dark text on light background */
+[data-theme="light"] .btn.secondary {
+    background: #FFFFFF !important;
+    color: #1A1A1A !important;
+    border: 1.5px solid #D1D5DB !important;
+}
+
+[data-theme="light"] .btn.secondary:hover {
+    background: #F3F4F6 !important;
+    color: #65A30D !important;
+    border-color: #65A30D !important;
+}
+
+/* Danger buttons */
+[data-theme="light"] .btn.danger {
+    background: #FEE2E2 !important;
+    color: #DC2626 !important;
+    border: 1.5px solid #DC2626 !important;
+}
+
+[data-theme="light"] .btn.danger:hover {
+    background: #DC2626 !important;
+    color: #FFFFFF !important;
+}
+
+/* Card heading text */
+[data-theme="light"] .card h2 {
+    color: #1A1A1A !important;
+}
+
+/* Badge text — higher contrast */
+[data-theme="light"] .badge.assigned,
+[data-theme="light"] .badge.driver_on_way,
+[data-theme="light"] .badge.driver_arrived,
+[data-theme="light"] .badge.vehicle_loaded,
+[data-theme="light"] .badge.trip_in_progress {
+    background: rgba(101, 163, 13, 0.15) !important;
+    color: #4D7C0F !important;
+    font-weight: 800 !important;
+}
+
+[data-theme="light"] .badge.driver_accepted {
+    background: rgba(101, 163, 13, 0.2) !important;
+    color: #365314 !important;
+    font-weight: 800 !important;
+}
+
+[data-theme="light"] .badge.trip_completed {
+    background: rgba(5, 150, 105, 0.15) !important;
+    color: #059669 !important;
+    font-weight: 800 !important;
+}
+
+[data-theme="light"] .badge.cancelled,
+[data-theme="light"] .badge.no_driver_available {
+    background: rgba(220, 38, 38, 0.15) !important;
+    color: #B91C1C !important;
+    font-weight: 800 !important;
+}
+
+/* From/To text in trip tab */
+[data-theme="light"] .card div[style*="color: var(--muted)"],
+[data-theme="light"] .card div[style*="color:var(--muted)"] {
+    color: #4B5563 !important;
+}
+
+/* Toast text */
+[data-theme="light"] #vra-toast {
+    background: #1A1A1A !important;
+    color: #FFFFFF !important;
+    border: 1px solid #65A30D !important;
+}
+
+/* Nav active */
+[data-theme="light"] .nav-item.active {
+    background: #65A30D !important;
+    color: #FFFFFF !important;
+}
+
+/* Header buttons */
+[data-theme="light"] #theme-toggle,
+[data-theme="light"] #lang-toggle {
+    background: #FFFFFF !important;
+    color: #1A1A1A !important;
+    border: 1px solid #D1D5DB !important;
+}
+
+[data-theme="light"] #theme-toggle:hover,
+[data-theme="light"] #lang-toggle:hover {
+    background: #65A30D !important;
+    color: #FFFFFF !important;
+    border-color: #65A30D !important;
+}
+

@@ -422,9 +422,7 @@
             if (booking && booking.id) {
                 loadActiveBooking();
                 loadBookingHistory();
-                if (typeof window.startLiveTracking === 'function' && booking.id) {
-                    try { window.startLiveTracking(booking.id); } catch(e) {}
-                }
+                // Do NOT auto-start tracking. User must click 'Track Driver'.
             }
         } catch(e) {
             showToast('Booking failed: ' + e.message, 'error');

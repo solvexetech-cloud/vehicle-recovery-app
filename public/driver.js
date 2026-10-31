@@ -252,7 +252,7 @@
                 + '<div style="margin-bottom:8px;"><strong>🏁 Destination:</strong> ' + dest + '</div>'
                 + '<div><strong>💰 Fare:</strong> QAR ' + fare + '</div>';
         }
-        let seconds = 20;
+        let seconds = 60;
         const timerEl = document.getElementById('offer-timer');
         if (timerEl) timerEl.textContent = seconds + 's';
         if (driverState.offerTimer) clearInterval(driverState.offerTimer);
@@ -356,16 +356,41 @@
             actions.push({ label: 'Complete Trip', endpoint: 'complete', icon: '✅' });
         }
 
+        // Extract addresses from nested structure
+        const pickupAddr = (trip.pickup && trip.pickup.address) || trip.pickupAddress || trip.pickup_address || '—';
+        const destAddr = (trip.destination && trip.destination.address) || trip.destinationAddress || trip.destination_address || '—';
+        const fare = trip.agreed_fare_minor ? 'QAR ' + (trip.agreed_fare_minor / 100).toFixed(2) : '';
+        const bookingNum = trip.booking_number || trip.bookingNumber || trip.id;
+
+        // Determine route target based on status
+        // Before loaded: driver goes to pickup
+        // After loaded (start-trip, in-progress): driver goes to destination
+        const goingToPickup = ['assigned', 'driver_accepted', 'driver_on_way', 'driver_arrived'].includes(status);
+        const target = goingToPickup ? trip.pickup : trip.destination;
+        const targetLabel = goingToPickup ? 'Pickup' : 'Destination';
+
         let html = '<div class="card">'
             + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">'
-            + '<h2 style="margin:0;">Active Trip</h2>'
+            + '<div>'
+            + '<h2 style="margin:0;font-size:1.1em;">Booking #' + bookingNum + '</h2>'
+            + (fare ? '<div style="color:var(--primary);font-weight:700;margin-top:4px;">' + fare + '</div>' : '')
+            + '</div>'
             + '<span class="badge ' + status + '">' + status.replace(/_/g,' ').toUpperCase() + '</span>'
             + '</div>'
-            + '<div style="font-size:0.9em;color:var(--muted);margin-bottom:16px;">'
-            + '📍 <strong>From:</strong> ' + ((trip.pickup && trip.pickup.address) || trip.pickupAddress || trip.pickup_address || '—') + '<br>'
-            + '🏁 <strong>To:</strong> ' + ((trip.destination && trip.destination.address) || trip.destinationAddress || trip.destination_address || '—')
+            + '<div style="font-size:0.9em;color:var(--muted);margin-bottom:16px;line-height:1.6;">'
+            + '<div>📍 <strong>From:</strong> ' + pickupAddr + '</div>'
+            + '<div style="margin-top:4px;">🏁 <strong>To:</strong> ' + destAddr + '</div>'
             + '</div>';
 
+        // Add map container (if pickup & destination have coords)
+        if (target && target.lat && target.lng) {
+            html += '<div id="driver-trip-map" style="height:300px;width:100%;border-radius:14px;margin-bottom:16px;border:1px solid var(--border);"></div>';
+            html += '<div id="driver-trip-info" style="padding:10px 14px;background:var(--input-bg);border-radius:12px;margin-bottom:12px;font-size:0.9em;">'
+                 + '<span style="color:var(--muted);">Calculating route...</span>'
+                 + '</div>';
+        }
+
+        // Action buttons
         if (actions.length > 0) {
             actions.forEach(function(a) {
                 html += '<button class="btn" style="margin-top:12px;" onclick="progressTrip(\'' + a.endpoint + '\')">'
@@ -377,16 +402,130 @@
         html += '</div>';
 
         tripTab.innerHTML = html;
+
+        // Initialize map after DOM update
+        if (target && target.lat && target.lng) {
+            setTimeout(function() { initDriverTripMap(trip, target, targetLabel); }, 300);
+        }
+    }
+
+    // ═══ DRIVER TRIP MAP ═══
+    let _driverTripMap = null;
+    let _driverTripMarker = null;
+    let _driverTargetMarker = null;
+    let _driverRouteLine = null;
+    let _driverRouteInterval = null;
+
+    function initDriverTripMap(trip, target, targetLabel) {
+        const mapEl = document.getElementById('driver-trip-map');
+        if (!mapEl) return;
+
+        // Destroy old map if exists
+        if (_driverTripMap) {
+            try { _driverTripMap.remove(); } catch(e) {}
+            _driverTripMap = null;
+        }
+        if (_driverRouteInterval) {
+            clearInterval(_driverRouteInterval);
+            _driverRouteInterval = null;
+        }
+
+        // Init map centered between driver and target
+        const targetCoords = [target.lat, target.lng];
+        _driverTripMap = L.map('driver-trip-map').setView(targetCoords, 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(_driverTripMap);
+
+        // Car icon for driver
+        const carSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FF9F1C" stroke="#0a0a0a" stroke-width="2"><path d="M10 17h4V5H2v12h3m10 0h4m-4 0a3 3 0 1 1-6 0m6 0a3 3 0 1 0 6 0M9 17a3 3 0 1 1-6 0m6 0a3 3 0 1 0 6 0"/><path d="M22 17h-4V9h3l3 4v4z"/></svg>';
+        const carIcon = L.icon({
+            iconUrl: 'data:image/svg+xml;utf8,' + encodeURIComponent(carSvg),
+            iconSize: [40, 40],
+            iconAnchor: [20, 20]
+        });
+
+        // Target marker (pickup or destination)
+        _driverTargetMarker = L.marker(targetCoords, {
+            icon: L.divIcon({
+                className: 'driver-target-marker',
+                html: '<div style="background:#FF9F1C;width:16px;height:16px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.3);"></div>',
+                iconSize: [22, 22]
+            })
+        }).addTo(_driverTripMap);
+        _driverTargetMarker.bindPopup('📍 ' + targetLabel + ': ' + (target.address || ''));
+
+        // Driver marker (car) — will update position
+        _driverTripMarker = L.marker(targetCoords, {icon: carIcon}).addTo(_driverTripMap);
+        _driverTripMarker.bindPopup('🚗 You');
+
+        // Route line
+        _driverRouteLine = L.polyline([], {color: '#FF9F1C', weight: 6, opacity: 0.9}).addTo(_driverTripMap);
+
+        // Fetch driver GPS from backend and draw route
+        function updateDriverRoute() {
+            fetch('/api/driver/profile', { credentials: 'include' })
+                .then(r => r.json())
+                .then(profile => {
+                    const d = profile.driver || profile.profile?.driver || {};
+                    const lat = d.last_gps_lat || profile.driver?.last_gps_lat;
+                    const lng = d.last_gps_lng || profile.driver?.last_gps_lng;
+                    if (!lat || !lng) return;
+                    
+                    const driverCoords = [lat, lng];
+                    _driverTripMarker.setLatLng(driverCoords);
+                    
+                    // Fetch OSRM route
+                    const url = 'https://router.project-osrm.org/route/v1/driving/' +
+                        lng + ',' + lat + ';' + target.lng + ',' + target.lat +
+                        '?overview=full&geometries=geojson';
+                    
+                    fetch(url).then(r => r.json()).then(data => {
+                        if (data.routes && data.routes[0]) {
+                            const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+                            _driverRouteLine.setLatLngs(coords);
+                            
+                            const distKm = (data.routes[0].distance / 1000).toFixed(1);
+                            const etaMin = Math.ceil(data.routes[0].duration / 60);
+                            const info = document.getElementById('driver-trip-info');
+                            if (info) {
+                                info.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;">'
+                                    + '<span><strong style="color:var(--primary);font-size:1.2em;">' + distKm + ' km</strong> to ' + targetLabel + '</span>'
+                                    + '<span style="color:var(--muted);">ETA: ' + etaMin + ' min</span>'
+                                    + '</div>';
+                            }
+                        }
+                    }).catch(e => console.warn('Route fetch:', e));
+                })
+                .catch(e => console.warn('GPS fetch:', e));
+        }
+
+        updateDriverRoute();
+        _driverRouteInterval = setInterval(updateDriverRoute, 5000);
     }
 
     window.progressTrip = async function(endpoint) {
         if (!driverState.activeTrip || !driverState.activeTrip.id) return;
         try {
-            await apiFetch('/api/driver/bookings/' + driverState.activeTrip.id + '/' + endpoint, { method: 'POST' });
+            const body = {};
+            // For 'arrived', add manual_fallback if GPS fails
+            if (endpoint === 'arrived') {
+                body.manual_fallback = true;
+                body.reason = 'Driver confirmed arrival manually (GPS may be inaccurate)';
+            }
+            await apiFetch('/api/driver/bookings/' + driverState.activeTrip.id + '/' + endpoint, { 
+                method: 'POST', 
+                body: body 
+            });
             showToast('Status updated', 'success');
             await loadActiveTrip();
         } catch(e) {
-            showToast('Update failed: ' + e.message, 'error');
+            // If manual_fallback failed, retry with error message
+            if (endpoint === 'arrived' && e.message.includes('gps_not_near_pickup')) {
+                showToast('GPS too far from pickup. Move closer or check GPS.', 'error');
+            } else {
+                showToast('Update failed: ' + e.message, 'error');
+            }
         }
     };
 
